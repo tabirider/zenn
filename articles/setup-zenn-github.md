@@ -3,7 +3,7 @@ title: "ZennとGitHub連携の手順メモ(テスト中)"
 emoji: "✍️"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["zenn", "Git", "GitHub"]
-published: false
+published: true
 ---
 Zenn公式にはGitのローカルリポジトリ作成の記載がなかったので、それも含めてWindows環境でのZennとGitHubの連携手順メモ。GitHub普段使わない人(私)用。
 Markdown記法のファイル(.md)を書いてGitHubに投げれば、自動でZennのサイトに掲載される便利機能。
