@@ -5,16 +5,16 @@ type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["windows", "zenn", "git", "github", "zenncli"]
 published: false
 ---
-Zenn公式にはGitの詳細に関する記載がないので、それも含めてWindows環境でのZennとGitHubの連携手順メモ。GitHub普段使わない人(私)、WindowsでGit使わん人用。
-Markdown記法のファイル(.md)を書いてGitHubに投げれば、自動でZennのサイトに掲載されるようになる。ここではテキストエディタにVisual Studio Codeを使い、そこからGitHubに投げれるようにしていきます。
+Zenn公式にはGitの詳細に関する記載がないので、それも含めてWindows環境でのZennとGitHubの連携手順メモ。普段GitHub使わない人(私)、WindowsでGit使わん人用。
+Markdown記法のファイル(.md)を書いてGitHubに投げれば、自動でZennのサイトに掲載される。ここではテキストエディタにVisual Studio Codeを使い、そこからGitHubに投げるまでをまとめます。
 
 ## メリット
 - ブラウザのエディタから開放される。好きなエディタでサッと書ける
 - GitHubに版管理を丸投げできる
 - Zenn CLIを導入すればlocalhost:8000でプレビューできる(便利)
 ## デメリット
-- Zenn CLIはPC毎にセットアップが必要
-- Node.jsのインストールが必要(23年12月時点でv14以上)。毎年2回バージョン上がるので、人によっては環境競合するかも
+- Zenn CLI、Git、VSCode諸々PC毎にセットアップ必要
+- Node.jsのインストール必要(23年12月時点でv14以上)。毎年2回バージョン上がるので、人によっては環境競合するかも
 - Gitにせよ何にせよWindowsで使うのは~~クソ~~面倒
 
 :::message
@@ -23,7 +23,7 @@ Markdown記法のファイル(.md)を書いてGitHubに投げれば、自動でZ
 
 ## 手順
 前提: Win11環境です。
-> (お約束)エクスプローラのオプションから「登録されている拡張子は表示しない」のチェック外す、「隠しファイル、～を表示する」チェック(やってない人意外に多い)
+> (お約束)エクスプローラのオプションから「登録されている拡張子は表示しない」チェック外す、「隠しファイル、～を表示」チェック
 
 1. Zennのアカウント作成
     [Zennのサイト](https://zenn.dev/)でアカウント作成。
@@ -55,9 +55,6 @@ Markdown記法のファイル(.md)を書いてGitHubに投げれば、自動でZ
     # エクスプローラかなんかでGitの場所を探してパスに追加。
     # (場所はだいたいこのへん)
     > $env:PATH="$($env:PATH);C:\Program Files\Git\cmd"
-    # ↑の$()はサブエクスプレッション。"$env:PATH;C:\Program Files～"と
-    # 書いても問題ないが、PowerShellで文字列中に変数展開するときは$()を使うように
-    # 癖つけといたほうがいい。PowerShellは面倒なんで深入りしない
     # ただし、$env:PATHはセッション内限定なので消えてしまう。永続化する場合は
     # ユーザ毎の設定:
     > [System.Environment]::SetEnvironmentVariable("PATH", "$($env:PATH);C:\Program Files\Git\cmd", [System.EnvironmentVariableTarget]::User)
@@ -80,7 +77,7 @@ Markdown記法のファイル(.md)を書いてGitHubに投げれば、自動でZ
     ![](/images/setup-zenn-github/setting-win-path-06.png)
     (なんにしても~~クソ~~面倒)
 
-6. Gitの設定
+6. Gitの設定(最初だけ)
     ```powershell
     > git config --global user.name "ユーザ名"       #お決まり
     > git config --global user.email "mail@address" #お決まり
@@ -156,7 +153,7 @@ Markdown記法のファイル(.md)を書いてGitHubに投げれば、自動でZ
     fatal: not a git repository (or any of the parent directories): .git
     ```
     のように怒られる。
-    ちなみに、隠しフォルダ`.git`を削除すればローカルリポジトリは完全に消滅する。
+    ちなみに、隠しフォルダ`.git`を削除すればGitのローカルリポジトリは完全に消滅する。
 
 13. GitのローカルリポジトリとGitHubのリポジトリを紐付け
     GitHubのサイトから作成済のリポジトリに移動し、SSHのリモートアドレス(`git@github.com:～～/～～.git`)をコピー。
@@ -203,8 +200,27 @@ Markdown記法のファイル(.md)を書いてGitHubに投げれば、自動でZ
     ステージングエリアへの移動：
     ```powershell
     > git add .\articles\(ファイル名).md #特定のファイルをステージング
-    > git add .\articles\.
+    > git add .\articles\               #articles内の全ファイルをステージング
     ```
+    または、Visual Studio CodeでGitHub Pull Requestsを導入していれば、`ソース管理`から変更したファイルの`+`マークでステージングできる。
+    ![](/images/setup-zenn-github/vscode-staging.png)
+    ステージングが完了したら、ローカルリポジトリにコミットする。
+    ```powershell
+    > git commit -m "コミットメッセージ"
+    ```
+    またはVS Codeから
+    ![](/images/setup-zenn-github/vscode-commit.png)
+    これでローカルリポジトリが更新され、GitHubにpushできる状態になる。
+    ```powershell
+    # 最初は-uオプションでローカルとGitHubのブランチ(main)を紐づける。
+    > git push -u origin main
+    # 一度-uオプション指定すれば、次からは
+    > git push
+    # だけでOK。
+    ```
+
+
+
 
 
 
