@@ -190,13 +190,15 @@ Markdown記法のファイル(.md)を書いてGitHubに投げれば、自動でZ
     ```
     ブラウザで`http://localhost:8000`を開くと、.mdファイルを更新する度にプレビューも更新されていく。便利。
 
-16. Gitのステージング・GitHubにプッシュ(普段Git使わない人向け)
+16. Gitのステージング・GitHubにプッシュ
+    **(ここから普段Git使わない人向け)**
     Gitにはステージングという構造がある。
     ```mermaid
     flowchart LR
     A[working<br>directory<br>#040;編集できる#041;] -- add --> B[staging<br>area] -- commit --> C[ローカル<br>リポジトリ] -- push --> D[(GitHub)]
     ```
-    VSCodeで編集している.mdファイルはワーキングディレクトリ・作業ツリーと呼ばれ、そこからステージングエリアに移動させてから、ローカルリポジトリにコミットできる。そこから更にpushしてGitHubに辿り着く。ファイルを編集できるのはワーキングディレクトリだけ。
+    VSCodeで編集している.mdファイルはワーキングディレクトリ・作業ツリーと呼ばれ、そこからステージングエリアに移動させてから、ローカルリポジトリにコミットできる。(必要なファイルだけコミットしたりする仕組み。ステージングはファイル単位、コミットはまとめて、のイメージ)
+    そこから更にpushしてGitHubに辿り着く。ファイルを編集できるのはワーキングディレクトリだけ。
     ステージングエリアへの移動：
     ```powershell
     > git add .\articles\(ファイル名).md #特定のファイルをステージング
@@ -210,7 +212,7 @@ Markdown記法のファイル(.md)を書いてGitHubに投げれば、自動でZ
     ```
     またはVS Codeから
     ![](/images/setup-zenn-github/vscode-commit.png)
-    これでローカルリポジトリが更新され、GitHubにpushできる状態になる。
+    これでローカルリポジトリが更新され、GitHubにpushできる状態になる。最初は`published: false`で非公開状態にして試すのがオススメ。
     ```powershell
     # 最初は-uオプションでローカルとGitHubのブランチ(main)を紐づける。
     > git push -u origin main
@@ -218,47 +220,53 @@ Markdown記法のファイル(.md)を書いてGitHubに投げれば、自動でZ
     > git push
     # だけでOK。
     ```
+    VS Codeからも可能。
+    ![](/images/setup-zenn-github/vscode-push.png)
+    これでZennのサイトを見て、下書き状態で見れるようになっていたらOK。
+    Zennの記事を個人で書いている分には`branch`とか`merge`とか必要ないと思うので、これくらいの操作で間に合いそう。(別のPCでも記事を更新するときは、GitHubからローカルリポジトリに落としてくるpullが必要)
+    確認が済んだら、`published: true`に変更して再プッシュしたら完了です。
 
+## SSHエージェントの使用
+GitHubにpushするとき、毎回パスフレーズを聞かれる。入力が面倒ならSSHエージェントを使う。SSHエージェントはパスフレーズをメモリに保持する仕組みを持っていてセキュリティ高め(そのかわりPC再起動したら初回はパスフレーズを聞かれる)。
+Windowsでも10以降はOpenSSHクライアントが標準で入っているので、以下手順で設定しておくと便利。
+1. .ssh/configファイルを作成
+    `C:\Users\(ユーザ名)\.ssh`フォルダに`config`ファイルを作成(拡張子なし)
+    内容はこんな感じ。
+    ```powershell
+    Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_rsa
+    AddKeysToAgent yes
+    ```
+    AddKeysToAgentでパスフレーズを記憶してくれるようになる。
 
+2. OpenSSH Authentication Agentを起動
+    Windowsの`スタート`→`Windowsツール`→`サービス`を開く
+    `OpenSSH Authentication Agent`を選択し、「スタートアップの種類」を「自動」に
+    さらに「開始」でサービスを立ち上げる。
+    ![](/images/setup-zenn-github/openssh-agent.png)
 
-
-
-
-17. SSHエージェントの使用
-    パスフレーズを毎回入力するのは面倒なので、SSHエージェントを使う。SSHエージェントはパスフレーズをディスクではなくメモリに保持するのでセキュリティ高め。Windowsでも10以降はOpenSSHクライアントが標準で入っているので、以下手順で設定しておくと便利。
-    1. .ssh/configファイルを作成
-        `C:\Users\(ユーザ名)\.ssh`フォルダに`config`ファイルを作成(拡張子なし)
-        ```powershell
-        Host github.com
-        HostName github.com
-        User git
-        IdentityFile ~/.ssh/id_rsa
-        AddKeysToAgent yes
-        ```
-    2. OpenSSH Authentication Agentを起動
-        Windowsのスタート→Windowsツール→サービスを開く
-        "OpenSSH Authentication Agent"を選択し、「スタートアップの種類」を「自動」に
-        さらに「開始」でサービスを立ち上げる
-    3. SSHの起動・動作確認
-        ```powershell
-        > Get-Service ssh-agent
-        # サービスが起動しているとこんな感じになる
-        Status   Name               DisplayName
-        ------   ----               -----------
-        Running  ssh-agent          OpenSSH Authentication Agent
-        > ssh -T git@github.com
-        # 最初はパスフレーズを聞かれる
-        Enter passphrase for key 'C:\Users\(ユーザ名)/.ssh/id_rsa':
-        Hi (ユーザ名)! You ve successfully authenticated, but GitHub does not provide shell access.
-        > ssh -T git@github.com
-        # 2回目はパスフレーズを聞かれない(成功)
-        Hi (ユーザ名)! You ve successfully authenticated, but GitHub does not provide shell access.
-        ```
-    4. Gitが使っているSSHクライアントを確認
-        Windowsに導入したGitが、OpenSSHではなくGitにバンドルされているものになっていたらうまく動作しない。
-        ```powershell
-        > git config core.sshCommand
-        # 何も表示されなければバンドルのSSHを使ってる可能性
-        # 明示的にWIndowsのSSHサービスを使うように設定
-        > git config --global core.sshCommand "C:/Windows/System32/OpenSSH/ssh.exe"
-        ```
+3. SSHの起動・動作確認
+    ```powershell
+    > Get-Service ssh-agent
+    # サービスが起動しているとこんな感じになる
+    Status   Name               DisplayName
+    ------   ----               -----------
+    Running  ssh-agent          OpenSSH Authentication Agent
+    > ssh -T git@github.com
+    # 最初はパスフレーズを聞かれる
+    Enter passphrase for key 'C:\Users\(ユーザ名)/.ssh/id_rsa':
+    Hi (ユーザ名)! You ve successfully authenticated, but GitHub does not provide shell access.
+    > ssh -T git@github.com
+    # 2回目はパスフレーズを聞かれない(成功)
+    Hi (ユーザ名)! You ve successfully authenticated, but GitHub does not provide shell access.
+    ```
+4. Gitが使っているSSHクライアントを確認
+    Windowsに導入したGitが、OpenSSHではなくGitにバンドルされているものになっていたらうまく動作しない。
+    ```powershell
+    > git config core.sshCommand
+    # 何も表示されなければバンドルのSSHを使ってる可能性
+    # 明示的にWIndowsのSSHサービスを使うように設定
+    > git config --global core.sshCommand "C:/Windows/System32/OpenSSH/ssh.exe"
+    ```
