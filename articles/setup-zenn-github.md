@@ -105,4 +105,25 @@ Markdown記法のファイル(.md)を書いてGitHubに投げれば、自動でZ
        Windowsのスタート→Windowsツール→サービスを開く
        "OpenSSH Authentication Agent"を選択し、「スタートアップの種類」を「自動」に
        さらに「開始」でサービスを立ち上げる
-    3. この状態でもっかいてすと
+    3. SSHの起動・動作確認
+       ```powershell
+       > Get-Service ssh-agent
+       # サービスが起動しているとこんな感じになる
+       Status   Name               DisplayName
+       ------   ----               -----------
+       Running  ssh-agent          OpenSSH Authentication Agent
+       > ssh -T git@github.com
+       # 最初はパスフレーズを聞かれる
+       Enter passphrase for key 'C:\Users\(ユーザ名)/.ssh/id_rsa':
+       Hi (ユーザ名)! You ve successfully authenticated, but GitHub does not provide shell access.
+       > ssh -T git@github.com
+       # 2回目はパスフレーズを聞かれない(成功)
+       Hi (ユーザ名)! You ve successfully authenticated, but GitHub does not provide shell access.
+       ```
+    4. Gitが使っているSSHクライアントを確認
+       Windowsに導入したGitが、OpenSSHではなくGitにバンドルされているものになっていたらうまく動作しない。
+       ```powershell
+       > git config core.sshCommand
+       # 何も表示されなければ
+       git config --global core.sshCommand "C:/Windows/System32/OpenSSH/ssh.exe"
+       ```
