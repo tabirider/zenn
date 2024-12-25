@@ -85,17 +85,23 @@ Markdown記法のファイル(.md)を書いてGitHubに投げれば、自動でZ
    エクスプローラだとPC→Windows(C:)→ユーザー→(ユーザ名)→.sshで辿れる。
    ファイルを適当なテキストエディタで開いて、中身の`ssh-rsa ～～～`のテキストを丸ごとコピー
    GitHubのサイトから右上のアイコン→Settings→SSH and GPG keys→New SSH keyでKeyにコピーしたテキストをそのまま貼り付け→Add SSH key
-   > パスフレーズについて
-   > 設定を推奨。GitHubにプッシュする度に聞かれるので、面倒ならSSHエージェントを使う。SSHエージェントはパスフレーズをディスクではなくメモリに保持するのでセキュリティ高め。Windowsでも10以降はOpenSSHクライアントが標準で入っているので、以下手順で設定しておくと便利。
-   1. .ssh/configファイルを作成
-      `C:\Users\(ユーザ名)\.ssh`フォルダに`config`ファイルを作成(拡張子なし)
-   ```powershell
-   Host github.com
-     HostName github.com
-     User git
-     IdentityFile ~/.ssh/id_rsa
-     AddKeysToAgent yes
-   ```
 
 8. Node.jsをインストール
    [公式サイト](https://nodejs.org/)からダウンロード
+
+
+9. SSHエージェントの使用
+   パスフレーズを毎回入力するのは面倒なので、SSHエージェントを使う。SSHエージェントはパスフレーズをディスクではなくメモリに保持するのでセキュリティ高め。Windowsでも10以降はOpenSSHクライアントが標準で入っているので、以下手順で設定しておくと便利。
+   1. .ssh/configファイルを作成
+      `C:\Users\(ユーザ名)\.ssh`フォルダに`config`ファイルを作成(拡張子なし)
+    ```powershell
+    Host github.com
+        HostName github.com
+        User git
+        IdentityFile ~/.ssh/id_rsa
+        AddKeysToAgent yes
+    ```
+    2. OpenSSH Authentication Agentを起動
+       Windowsのスタート→Windowsツール→サービスを開く
+       "OpenSSH Authentication Agent"を選択し、「スタートアップの種類」を「自動」に
+       さらに「開始」でサービスを立ち上げる
