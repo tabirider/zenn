@@ -105,3 +105,4 @@ Markdown記法のファイル(.md)を書いてGitHubに投げれば、自動でZ
        Windowsのスタート→Windowsツール→サービスを開く
        "OpenSSH Authentication Agent"を選択し、「スタートアップの種類」を「自動」に
        さらに「開始」でサービスを立ち上げる
+    3. この状態で
