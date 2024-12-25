@@ -96,5 +96,6 @@ Markdown記法のファイル(.md)を書いてGitHubに投げれば、自動でZ
      IdentityFile ~/.ssh/id_rsa
      AddKeysToAgent yes
    ```
+
 8. Node.jsをインストール
    [公式サイト](https://nodejs.org/)からダウンロード
