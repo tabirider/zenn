@@ -88,9 +88,13 @@ Markdown記法のファイル(.md)を書いてGitHubに投げれば、自動でZ
    > パスフレーズについて
    > 設定を推奨。GitHubにプッシュする度に聞かれるので、面倒ならSSHエージェントを使う。SSHエージェントはパスフレーズをディスクではなくメモリに保持するのでセキュリティ高め。Windowsでも10以降はOpenSSHクライアントが標準で入っているので、以下手順で設定しておくと便利。
    1. .ssh/configファイルを作成
-      `C:\Users\(ユーザ名)\.ssh\config`フォルダに
+      `C:\Users\(ユーザ名)\.ssh`フォルダに`config`ファイルを作成(拡張子なし)
    ```powershell
-
+   Host github.com
+     HostName github.com
+     User git
+     IdentityFile ~/.ssh/id_rsa
+     AddKeysToAgent yes
    ```
 8. Node.jsをインストール
    [公式サイト](https://nodejs.org/)からダウンロード
