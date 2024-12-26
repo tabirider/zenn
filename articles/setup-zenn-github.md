@@ -1,17 +1,18 @@
 ---
-title: "ZennとGitHub連携の手順メモ"
+title: "ZennとGitHub連携の手順メモ(普段Git使わない人用)"
 emoji: "✍️"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["windows", "zenn", "git", "github", "zenncli"]
-published: false
+topics: ["windows", "zenn", "github", "zenncli", "vscode"]
+published: true
 ---
 Zenn公式にはGitの詳細に関する記載がないので、それも含めてWindows環境でのZennとGitHubの連携手順メモ。普段GitHub使わない人(私)、WindowsでGit使わん人用。
-Markdown記法のファイル(.md)を書いてGitHubに投げれば、自動でZennのサイトに掲載される。ここではテキストエディタにVisual Studio Codeを使い、そこからGitHubに投げるまでをまとめます。
+
+Markdown記法のファイル(.md)を書いてGitHubに投げれば、自動でZennのサイトに掲載される仕組み。ここではテキストエディタにVisual Studio Codeを使い、そこからGitHubに投げるまでをまとめます。
 
 ## メリット
 - ブラウザのエディタから開放される。好きなエディタでサッと書ける
 - GitHubに版管理を丸投げできる
-- Zenn CLIを導入すればlocalhost:8000でプレビューできる(便利)
+- Zenn CLIを導入すればブラウザでの見た目をリアルタイムでプレビューできる(便利)
 ## デメリット
 - Zenn CLI、Git、VSCode諸々PC毎にセットアップ必要
 - Node.jsのインストール必要(23年12月時点でv14以上)。毎年2回バージョン上がるので、人によっては環境競合するかも
@@ -20,253 +21,304 @@ Markdown記法のファイル(.md)を書いてGitHubに投げれば、自動でZ
 :::message
 手順は変わることもあります。基本は[公式](https://zenn.dev/zenn/articles/connect-to-github)を参照ください。
 :::
-
+:::message
+Windows環境でLinux出自のgitコマンドとか使うと「\」と「/」がごっちゃになります。ついでに、PowerShellからコマンド入力する手順がありますが、PoweShellで「\」を入力すると`\`と表示されます・・注意が必要なところは補記しています。
+:::
 ## 手順
 前提: Win11環境です。
 > (お約束)エクスプローラのオプションから「登録されている拡張子は表示しない」チェック外す、「隠しファイル、～を表示」チェック
 
-1. Zennのアカウント作成
-    [Zennのサイト](https://zenn.dev/)でアカウント作成。
+### Zennのアカウント作成
+[Zennのサイト](https://zenn.dev/)でアカウント作成。
 
-2. GitHubのアカウント作成
-    [GitHubのサイト](https://github.co.jp/)でアカウント作成。まずは無償版でOK。
+### GitHubのアカウント作成
+[GitHubのサイト](https://github.co.jp/)でアカウント作成。まずは無償版でOK。
+※GitHubでは最近2段階認証が求められるようになってます、スマホにGoogle Authenticatorとかのアプリを入れておきましょう。スマホ用GitHubアプリでもOK。あとはGitHubサイトの指示通りにやればOKです。
 
-3. GitHubでリポジトリ作成
-    GitHubの`Dashboard`から`Top repositories`→`New`でリポジトリ名を入力。
-    `Public`でも`Private`でもOK。`README`ファイル→不要、`.gitignore`→`None`、`licence`→`None`でOK。
+### GitHubでリポジトリ作成
+GitHubの`Dashboard`から`Top repositories`→`New`でリポジトリ名を入力。
+`Public`でも`Private`でもOK。`README`ファイル→不要、`.gitignore`→`None`、`licence`→`None`でOK。
 
-4. ZennとGitHubの連携
-    [公式](https://zenn.dev/zenn/articles/connect-to-github)参照
+### ZennとGitHubの連携
+[公式](https://zenn.dev/zenn/articles/connect-to-github)参照。
 
-5. Gitのインストール
-    [Gitのサイト](https://git-scm.com/downloads)からダウンロード
-    またはPowerShellから
-    ```powershell
-    > winget install --id Git.Git -e --source winget
-    ```
-    パスが通ってるか確認
-    PowerShellから
-    ```powershell
-    > git --version
-    ```
-    バージョン出たらOKなのでGitの設定に進む。
-    エラー出たらパス通ってないのでGitの場所を確認して環境変数PATHに追加
-    ```powershell
-    # エクスプローラかなんかでGitの場所を探してパスに追加。
-    # (場所はだいたいこのへん)
-    > $env:PATH="$($env:PATH);C:\Program Files\Git\cmd"
-    # ただし、$env:PATHはセッション内限定なので消えてしまう。永続化する場合は
-    # ユーザ毎の設定:
-    > [System.Environment]::SetEnvironmentVariable("PATH", "$($env:PATH);C:\Program Files\Git\cmd", [System.EnvironmentVariableTarget]::User)
-    # PC全体の設定(管理者権限必要):
-    > [System.Environment]::SetEnvironmentVariable("PATH", "$($env:PATH);C:\Program Files\Git\cmd", [System.EnvironmentVariableTarget]::Machine)
-    # なんでパス通すのにこんなことなんねん...MSさん訳分からんで
-    ```
-    または画面からPATH書き換える。(これほんま場所よく忘れる)
-    スタート→設定(歯車マーク)
-    ![](/images/setup-zenn-github/setting-win-path-01.png)
-    →システム→バージョン情報
-    ![](/images/setup-zenn-github/setting-win-path-02.png)
-    →「デバイスの仕様」の下にくっついてる「システムの詳細設定」
-    ![](/images/setup-zenn-github/setting-win-path-03.png)
-    →詳細設定タブ→環境変数
-    ![](/images/setup-zenn-github/setting-win-path-04.png)
-    →ユーザかシステムの環境変数からPathを選択して「編集」
-    ![](/images/setup-zenn-github/setting-win-path-05.png)
-    →「新規」からGitのパスを追加
-    ![](/images/setup-zenn-github/setting-win-path-06.png)
-    (なんにしても~~クソ~~面倒)
+### Visual Studio Codeをインストール
+Gitのインストール前に入れておくのがおすすめ。[公式](https://azure.microsoft.com/ja-jp/products/visual-studio-code)からダウンロード。
+起動したら左側の`拡張機能`から`Japanese Language Pack for Visual Studio Code`、`GitHub Pull Requests`、`Markdown All in One`あたりをダウンロードしておく。
 
-6. Gitの設定(最初だけ)
-    ```powershell
-    > git config --global user.name "ユーザ名"       #お決まり
-    > git config --global user.email "mail@address" #お決まり
-    > git config --global init.defaultBranch main #masterじゃなくてmainにしようね
-    ```
-    configのリスト確認方法：
-    ```powershell
-    > git config list
-    ```
-    ↑でメールアドレスとか設定されてるのを確認
-    ちなみにWindows版でGit.configファイルの場所は以下の通り。
-    ```powershell
-    C:\Program Files\Git\config    # デフォルト
-    C:\Users\(ユーザ名)\.gitconfig  # ユーザ毎
-    (リポジトリフォルダ)\.git/config # リポジトリ固有
-    ```
+### Gitのインストール
+[Gitのサイト](https://git-scm.com/downloads)からダウンロード。
+エディタは`Visual Studio Code`を選択
+`Override the default branch name for new repositories`が出たら`main`を選んでおく
+> BLMとかの関係で`master`は良くないよねって流れ。もうマスタースレーブとか言っちゃいけないって最近知りました。
+>
+`Use external OpenSSH`を選択。Windows10からは`OpenSSH`が標準でバンドルされてるので、今回はそっちを使います。Gitとの連携手順は後ろの方を参照。他はそのまま`Next`で大丈夫。
 
-7. GitHubにSSHキー登録
-    まず鍵作る。
-    ```powershell
-    > ssh-keygen -t rsa -b 4096 -C "mail@address"
-    ```
-    パスフレーズを要求されるので入力(パスフレーズは省略できるが非推奨)。これで秘密鍵と公開鍵ができるので公開鍵をGitHubに登録。
-    公開鍵の場所は
-    ```powershell
-    C:\Users\(ユーザ名)\.ssh\id_rsa.pub
-    ```
-    エクスプローラだとPC→Windows(C:)→ユーザー→(ユーザ名)→.sshで辿れる。
-    `id_rsa.pub`ファイルを適当なテキストエディタで開いて、「中身の`ssh-rsa ～～～`のテキスト」を丸ごとコピー。(テキストエディタを入れてなければ「メモ帳」を開いて`id_rsa.pub`ファイルをドラッグ&ドロップすればOK)
-    GitHubのサイトから右上のアイコン→`Settings`→`SSH and GPG keys`→`New SSH key`で`Key`にコピーしたテキストをそのまま貼り付け→`Add SSH key`
+パスが通ってるか確認
+PowerShellから
+```powershell
+> git --version
+```
+バージョン出たらOKなので**Gitの設定**に進む。
+(以降の記載でも
+```powershell
+> コマンド
+```
+という表記は、全てPowerShellから`コマンド`の部分を実行します)
 
-8. Visual Studio Codeをインストール
-    [公式](https://azure.microsoft.com/ja-jp/products/visual-studio-code)からダウンロード。
-    起動したら左側の`拡張機能`から`Japanese Language Pack for Visual Studio Code`、`GitHub Pull Requests`、`Markdown All in One`あたりをダウンロードしておく。
+### もしgitコマンドが認識されなかったら
+エラー出たらパス通ってない可能性が高い。Gitの場所を確認して環境変数PATHに追加
+```powershell
+# エクスプローラかなんかでGitの場所を探してパスに追加。
+# (場所はだいたいこのへん) *ここはバックスラッシュです*
+> $env:PATH="$($env:PATH);C:\Program Files\Git\cmd"
+# ただし、$env:PATHはセッション内限定なので消えてしまう。永続化する場合は
+# ユーザ毎の設定:
+> [System.Environment]::SetEnvironmentVariable("PATH", "$($env:PATH);C:\Program Files\Git\cmd", [System.EnvironmentVariableTarget]::User)
+# PC全体の設定(管理者権限必要):
+> [System.Environment]::SetEnvironmentVariable("PATH", "$($env:PATH);C:\Program Files\Git\cmd", [System.EnvironmentVariableTarget]::Machine)
+# なんでパス通すのにこんなことなんねん...MSさん訳分からんで
+```
+または画面からPATH書き換える。(これ普段win使ってないとほんま場所よく忘れる)
+`Windows`キー+`X`→`設定`
+![](/images/setup-zenn-github/setting-win-path-01.png)
+→システム→バージョン情報
+![](/images/setup-zenn-github/setting-win-path-02.png)
+→「デバイスの仕様」の下にくっついてる「システムの詳細設定」
+![](/images/setup-zenn-github/setting-win-path-03.png)
+→詳細設定タブ→環境変数
+![](/images/setup-zenn-github/setting-win-path-04.png)
+→ユーザかシステムの環境変数からPathを選択して「編集」
+![](/images/setup-zenn-github/setting-win-path-05.png)
+→「新規」からGitのパス(`C:\Program Files\Git\cmd`)を追加
+![](/images/setup-zenn-github/setting-win-path-06.png)
+(どっちにしても~~クソ~~面倒)
 
-9.  **Zennで管理するフォルダ**を作成。このフォルダは同時に**Gitのローカルリポジトリ**にもなる。(ここでは`D:\Zenn`とする。エクスプローラで作ってもOK)
-    ```powershell
-    > mkdir D:\Zenn
-    # ちなみにmkdirはPowerShellのコマンドレットNew-Itemのエイリアス。
-    # PowerShell的に書くと
-    > New-Item -Path "D:\Zenn" -ItemType Directory
-    # になるらしい。無理やり古のDOS窓に似た動きにしてくれてるだけ。
-    # インターネッツ老人会のオッサンは非常に混乱する。
-    ```
-    ![](/images/setup-zenn-github/setting-win-path-07.png)
+パスを通したらPowerShellを再立ち上げ。これで認識してくれるはず。
 
-10. Node.jsをインストール
-    [公式サイト](https://nodejs.org/)参照
+### Gitの設定(最初だけ)
+```powershell
+> git config --global user.name "ユーザ名"       #お決まり
+> git config --global user.email "mail@address" #お決まり
+> git config --global init.defaultBranch main #masterじゃなくてmainにしようね
+```
+configのリスト確認方法：
+```powershell
+> git config list
+```
+↑でメールアドレスとか設定されてるのを確認
+ちなみにWindows版でGit.configファイルの場所は以下の通り。(バージョンによって変わるかも)
+```powershell
+C:\Program Files\Git\etc\gitconfig  # デフォルト
+C:\Users\(ユーザ名)\.gitconfig       # ユーザ毎。メールアドレスとかはここに入るはず
+(リポジトリフォルダ)\.git\config      # リポジトリ固有
+```
 
-11. Zenn CLIをインストール
-    [公式サイト](https://zenn.dev/zenn/articles/install-zenn-cli)参照。このとき、**作成済のZenn用フォルダ**で実行する。
-    ```powershell
-    > cd D:\Zenn\
-    > npm init --yes # プロジェクトをデフォルト設定で初期化
-    > npm install zenn-cli # zenn-cliを導入
-    > npx zenn init
-    ```
-    これで`D:\Zenn\articles`フォルダが作成される。
+### GitHubにSSHキー登録
+まず鍵作る。パスフレーズは省略できる(が非推奨)。
+```powershell
+> ssh-keygen -t rsa -b 4096 -C "自分のmail@address"
+# 鍵を作るフォルダを指定。もう↓\と/がごっちゃになってますね
+Enter file in which to save the key (C:\Users\(ユーザ名)/.ssh/id_rsa): #そのままEnter
+Enter passphrase (empty for no passphrase): #任意のパスフレーズを入力(覚えておく)
+Enter same passphrase again: #もっかい入力
+```
+これで秘密鍵と公開鍵ができるので、公開鍵をGitHubに登録。公開鍵の場所は
+```powershell
+C:\Users\(ユーザ名)\.ssh\id_rsa.pub
+```
+エクスプローラだと`PC`→`Windows(C:)`→`ユーザー`→(ユーザ名)→`.ssh`で辿れる。
+![](/images/setup-zenn-github/id_rsa.png)
+`id_rsa.pub`ファイルを適当なテキストエディタで開いて(テキストエディタを入れてなければ「メモ帳」を開いて`id_rsa.pub`ファイルをドラッグ&ドロップすればOK)、「中身の`ssh-rsa ～～～`のテキスト」を丸ごとコピー。
+GitHubのサイトから右上のアイコン→`Settings`→`SSH and GPG keys`→`New SSH key`で`Key`にコピーしたテキストをそのまま貼り付け→`Add SSH key`
 
-12. Gitのローカルリポジトリ作成
-    これも**作成済のZenn用フォルダ**で実行。
-    ```powershell
-    > cd D:\Zenn
-    > git init
-    ```
-    これで`Zenn`フォルダの中に隠しフォルダ`.git`が作成され、Gitのローカルリポジトリとして機能するようになる。
-    リポジトリが機能しているかどうかは、`git init`を実行したフォルダで
-    ```powershell
-    > git status
-    ```
-    で確認できる。リポジトリでなければ
-    ```powershell
-    fatal: not a git repository (or any of the parent directories): .git
-    ```
-    のように怒られる。
-    ちなみに、隠しフォルダ`.git`を削除すればGitのローカルリポジトリは完全に消滅する。
+### OpenSSHエージェントサービスの有効化
+WindowsのOpenSSHサービスは通常停止しているので、それを有効化する。前準備が必要。
 
-13. GitのローカルリポジトリとGitHubのリポジトリを紐付け
-    GitHubのサイトから作成済のリポジトリに移動し、SSHのリモートアドレス(`git@github.com:～～/～～.git`)をコピー。
-    ```powershell
-    > git remote add origin git@github.com:～～/～～.git
-    # originはGitHubのリポジトリ名に対する別名。originでなくてもいいがお決まり。
-    ```
-    これでローカルリポジトリとGitHubが連携する。紐付けの状態は
-    ```powershell
-    > git remote -v
-    origin  git@github.com:～～/～～.git (fetch)
-    origin  git@github.com:～～/～～.git (push)
-    ```
-    のように確認できる。
-
-14. Markdown形式で記事の作成
-    [公式](https://zenn.dev/zenn/articles/zenn-cli-guide)参照。ただし、公式の
-    ```powershell
-    > npx zenn new:article
-    ```
-    だとファイル名([slug](https://zenn.dev/zenn/articles/what-is-slug))がランダムに生成されるため、
-    ```powershell
-    > npx zenn new:article --slug file-name-of-text
-    ```
-    のようにslugだけは指定したほうがいい。(英数・ハイフン・アンスコ12〜50文字)
-    Visual Studio Codeから`ファイル`→`フォルダーを開く`でZennフォルダーを開いて、`article`フォルダの下にできた.mdファイルを更新していく。
-    Markdown記法は[公式](https://zenn.dev/zenn/articles/markdown-guide)参照。
-
-15. プレビューの起動
-    [公式](https://zenn.dev/zenn/articles/zenn-cli-guide)参照。
-    ```powershell
-    # これもZennフォルダで
-    > npx zenn preview
-    ```
-    ブラウザで`http://localhost:8000`を開くと、.mdファイルを更新する度にプレビューも更新されていく。便利。
-
-16. Gitのステージング・GitHubにプッシュ
-    **(ここから普段Git使わない人向け)**
-    Gitにはステージングという構造がある。
-    ```mermaid
-    flowchart LR
-    A[working<br>directory<br>#040;編集できる#041;] -- add --> B[staging<br>area] -- commit --> C[ローカル<br>リポジトリ] -- push --> D[(GitHub)]
-    ```
-    VSCodeで編集している.mdファイルはワーキングディレクトリ・作業ツリーと呼ばれ、そこからステージングエリアに移動させてから、ローカルリポジトリにコミットできる。(必要なファイルだけコミットしたりする仕組み。ステージングはファイル単位、コミットはまとめて、のイメージ)
-    そこから更にpushしてGitHubに辿り着く。ファイルを編集できるのはワーキングディレクトリだけ。
-    ステージングエリアへの移動：
-    ```powershell
-    > git add .\articles\(ファイル名).md #特定のファイルをステージング
-    > git add .\articles\               #articles内の全ファイルをステージング
-    ```
-    または、Visual Studio CodeでGitHub Pull Requestsを導入していれば、`ソース管理`から変更したファイルの`+`マークでステージングできる。
-    ![](/images/setup-zenn-github/vscode-staging.png)
-    ステージングが完了したら、ローカルリポジトリにコミットする。
-    ```powershell
-    > git commit -m "コミットメッセージ"
-    ```
-    またはVS Codeから
-    ![](/images/setup-zenn-github/vscode-commit.png)
-    これでローカルリポジトリが更新され、GitHubにpushできる状態になる。最初は`published: false`で非公開状態にして試すのがオススメ。
-    ```powershell
-    # 最初は-uオプションでローカルとGitHubのブランチ(main)を紐づける。
-    > git push -u origin main
-    # 一度-uオプション指定すれば、次からは
-    > git push
-    # だけでOK。
-    ```
-    VS Codeからも可能。
-    ![](/images/setup-zenn-github/vscode-push.png)
-    これでZennのサイトを見て、下書き状態で見れるようになっていたらOK。
-    Zennの記事を個人で書いている分には`branch`とか`merge`とか必要ないと思うので、これくらいの操作で間に合いそう。(別のPCでも記事を更新するときは、GitHubからローカルリポジトリに落としてくるpullが必要)
-    確認が済んだら、`published: true`に変更して再プッシュしたら完了です。
-
-## SSHエージェントの使用
-GitHubにpushするとき、毎回パスフレーズを聞かれる。入力が面倒ならSSHエージェントを使う。SSHエージェントはパスフレーズをメモリに保持する仕組みを持っていてセキュリティ高め(そのかわりPC再起動したら初回はパスフレーズを聞かれる)。
-Windowsでも10以降はOpenSSHクライアントが標準で入っているので、以下手順で設定しておくと便利。
-1. .ssh/configファイルを作成
-    `C:\Users\(ユーザ名)\.ssh`フォルダに`config`ファイルを作成(拡張子なし)
-    内容はこんな感じ。
-    ```powershell
+1.  .ssh\configファイルを作成
+    `C:\Users\(ユーザ名)\.ssh`フォルダ(さっきと同じ場所)に`config`という名前のファイルを作成する。(拡張子なし。テキストファイルを作成→拡張子を削除)
+    適当なテキストエディタで開いて(拡張子削るとメモ帳では開けないのでファイルをドラッグ&ドロップ)、以下の内容を貼り付ける。
+    ```powershell:config
     Host github.com
-    HostName github.com
-    User git
-    IdentityFile ~/.ssh/id_rsa
-    AddKeysToAgent yes
+      HostName github.com
+      User git
+      IdentityFile ~/.ssh/id_rsa
+      AddKeysToAgent yes
     ```
-    AddKeysToAgentでパスフレーズを記憶してくれるようになる。
+    ↑`IdentityFile`で、`GitHub`に対してさっき作った鍵の片割れ(秘密鍵)`id_rsa`を指定している(GitHubのサイトに登録した公開鍵は`id_rsa.pub`のほう)。また、`AddKeysToAgent yes`指定で、OpenSSHのエージェントサービスがパスフレーズを記憶してくれるようになる(ただしメモリ上に覚えるだけなので、再起動時はまた聞かれる。パスフレーズは忘れないように)。
+    ちなみにWindows環境で`~/`は`C:\Users\(ユーザ名)\`に相当する。ドキュメソト フォルダではないので注意。
 
-2. OpenSSH Authentication Agentを起動
+2.  OpenSSH Authentication Agentを起動
     Windowsの`スタート`→`Windowsツール`→`サービス`を開く
-    `OpenSSH Authentication Agent`を選択し、「スタートアップの種類」を「自動」に
-    さらに「開始」でサービスを立ち上げる。
+    `OpenSSH Authentication Agent`を探して、`スタートアップの種類`を`自動`にして`適用`
+    さらに`開始`でサービスを立ち上げる。
     ![](/images/setup-zenn-github/openssh-agent.png)
 
-3. SSHの起動・動作確認
+3.  SSHの起動・動作確認
     ```powershell
     > Get-Service ssh-agent
     # サービスが起動しているとこんな感じになる
     Status   Name               DisplayName
     ------   ----               -----------
     Running  ssh-agent          OpenSSH Authentication Agent
+    # SSHエージェントが機能していることのチェック
     > ssh -T git@github.com
-    # 最初はパスフレーズを聞かれる
+    The authenticity of host 'github.com (xx.xx.xx.xx)' cant be established.
+    ED25519 key fingerprint is SHA256:～～.
+    This key is not known by any other names.
+    # 初めてつなぐ先だよ、という警告。yesと回答
+    Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+    # 既知のホストとして登録されたよ
+    Warning: Permanently added 'github.com' (ED25519) to the list of known hosts.
+    # 最初はパスフレーズを聞かれるので入力
     Enter passphrase for key 'C:\Users\(ユーザ名)/.ssh/id_rsa':
+    # これが出たらSSH接続成功
     Hi (ユーザ名)! You ve successfully authenticated, but GitHub does not provide shell access.
     > ssh -T git@github.com
-    # 2回目はパスフレーズを聞かれない(成功)
+    # うまく設定できていれば、2回目はパスフレーズを聞かれない
     Hi (ユーザ名)! You ve successfully authenticated, but GitHub does not provide shell access.
     ```
-4. Gitが使っているSSHクライアントを確認
-    Windowsに導入したGitが、OpenSSHではなくGitにバンドルされているものになっていたらうまく動作しない。
+
+4.  GitがOpenSSHクライアントを使うように設定
+    さっきインストールしたGitがOpenSSHを使えるように設定する。
     ```powershell
-    > git config core.sshCommand
-    # 何も表示されなければバンドルのSSHを使ってる可能性
-    # 明示的にWIndowsのSSHサービスを使うように設定
+    # 明示的にWIndowsのSSHサービスを使うように設定 *ここは\じゃなくて/なのに注意*
     > git config --global core.sshCommand "C:/Windows/System32/OpenSSH/ssh.exe"
     ```
+
+### 記事を管理するフォルダを作成
+**Zennの記事管理に使うフォルダ**を作成。このフォルダは同時に**Gitのローカルリポジトリ**にもなる。(ここでは`D:\Zenn`とする。エクスプローラで作ってもOK)
+```powershell
+> mkdir D:\Zenn
+# ちなみにmkdirはPowerShellのコマンドレットNew-Itemのエイリアス。
+# PowerShell的に書くと
+> New-Item -Path "D:\Zenn" -ItemType Directory
+# になるらしい。無理やり古のDOS窓に似た動きにしてくれてるだけ。
+# インターネッツ老人会のオッサンは非常に混乱する。
+```
+![](/images/setup-zenn-github/setting-win-path-07.png)
+
+### Node.jsをインストール
+[公式サイト](https://nodejs.org/)参照
+セットアップ画面の中で、`Automatically install the necessary tools. ～`はチェックしなくてOK。
+
+### Zenn CLIをインストール
+[公式サイト](https://zenn.dev/zenn/articles/install-zenn-cli)参照。このとき、**作成済のZenn用フォルダ**で実行する。
+```powershell
+> cd D:\Zenn\
+> npm init --yes # プロジェクトをデフォルト設定で初期化
+> npm install zenn-cli # zenn-cliを導入
+> npx zenn init
+```
+これで`D:\Zenn\articles`フォルダが作成される。
+> もし`npm`や`npx`が認識されない場合は、Gitのときと同様に`PATH`を設定する。(だいたい`C:\Program Files\nodejs`)
+
+### Gitのローカルリポジトリ作成
+これも**作成済のZenn用フォルダ**で実行。
+```powershell
+> cd D:\Zenn
+> git init
+```
+これで`Zenn`フォルダの中に隠しフォルダ`.git`が作成され、`Zenn`フォルダがGitのローカルリポジトリとして機能するようになる。以降は`.git`フォルダの中身以外は全てGitの管理下になる。
+> `Zenn`フォルダの中を見ると`node_modules`フォルダに大量のファイルが作られているが、これらは`.gitignore`ファイルで無視されるように設定されてるので、気にしなくて大丈夫。
+
+リポジトリが機能しているかどうかは、`git init`を実行したフォルダで
+```powershell
+> git status
+```
+で確認できる。リポジトリでなければ
+```powershell
+fatal: not a git repository (or any of the parent directories): .git
+```
+のように怒られる。
+ちなみに、隠しフォルダ`.git`を削除すればGitのローカルリポジトリは完全に消滅する。
+
+### GitのローカルリポジトリとGitHubのリポジトリを紐付け
+GitHubのサイトを開き、前に作成したリポジトリの画面に移動。
+SSHのリモートアドレス(`git@github.com:～～/～～.git`)が表示されてるので、それをコピー。
+(既に何かのファイルをpushした状態なら、`Code`を開けば出てくる)
+```powershell
+> git remote add origin git@github.com:～～/～～.git
+# originはGitHubのリポジトリ名に対する別名。originでなくてもいいがお決まり。
+```
+これでローカルリポジトリとGitHubが連携する。紐付けの状態は
+```powershell
+> git remote -v
+origin  git@github.com:～～/～～.git (fetch)
+origin  git@github.com:～～/～～.git (push)
+```
+のように確認できる。
+
+### Markdown形式で記事の作成
+[公式](https://zenn.dev/zenn/articles/zenn-cli-guide)参照。ただし、公式の
+```powershell
+> npx zenn new:article
+```
+だとファイル名([slug](https://zenn.dev/zenn/articles/what-is-slug))がランダムに生成されるため、
+```powershell
+> npx zenn new:article --slug file-name-of-text
+```
+のようにslugだけは指定したほうがいい。(英数・ハイフン・アンスコ12〜50文字)
+Visual Studio Codeから`ファイル`→`フォルダーを開く`でZennフォルダーを開いて、`article`フォルダの下にできた.mdファイルを更新していく。
+Markdown記法は[公式](https://zenn.dev/zenn/articles/markdown-guide)参照。
+
+### プレビューの起動
+[公式](https://zenn.dev/zenn/articles/zenn-cli-guide)参照。
+```powershell
+# これもZennフォルダで
+> npx zenn preview
+```
+ブラウザで`http://localhost:8000`を開くと、.mdファイルを更新する度にプレビューも更新されていく。便利。
+これを実行しているPowreShellの窓を閉じると、プレビュー機能も停止するので注意。
+
+### Gitのステージング・コミット・プッシュ
+**(普段Git使わない人向け)**
+Gitにはステージングという構造がある。
+```mermaid
+flowchart LR
+subgraph ローカル環境
+A[working<br>directory<br>#040;編集可能#041;]
+B[staging<br>area]
+C[local<br>repository]
+end
+subgraph GitHub
+D[(remote<br>reporitory)]
+end
+E[Zenn]
+A -- add --> B
+B -- commit --> C
+C -- push --> D
+D <-- 連携 --> E
+```
+VSCodeで編集できる.mdファイルはワーキングディレクトリ・作業ツリーと呼ばれ、そこからステージングエリアに移動(`add`)させてから、ローカルリポジトリにコミット(`commit`)する(必要なファイルだけコミットしたりする仕組み。ステージングはファイル単位、コミットはまとめて、のイメージ)。そこから更に`push`してGitHubに辿り着く。
+
+ステージングエリアへの移動：
+```powershell
+> git add .\articles\(ファイル名).md #特定のファイルをステージング
+> git add .\articles\               #articles内の全ファイルをステージング
+> git add .                         #Zennフォルダ下にある全ファイルをステージング
+```
+または、Visual Studio CodeでGitHub Pull Requestsを導入していれば、`ソース管理`から変更したファイルの`+`マークでステージングできる。
+![](/images/setup-zenn-github/vscode-staging.png)
+ステージングが完了したら、ローカルリポジトリにコミットする。
+```powershell
+> git commit -m "何を変更したかメモ"
+```
+またはVS Codeから
+![](/images/setup-zenn-github/vscode-commit.png)
+これでローカルリポジトリが更新されたが、まだGitHubには反映されていない。これからの手順は、まず`.md`ファイルの`published: false`で非公開状態にして試すのがオススメ。
+```powershell
+# 最初は-uオプションでローカルとGitHubのブランチ(main)を紐づける。
+> git push -u origin main
+# 一度-uオプション指定すれば、次からは
+> git push
+# だけでOK。
+```
+VS Codeからも可能。
+![](/images/setup-zenn-github/vscode-push.png)
+`git push -u`してない状態でVS Codeから`変更の同期`しようとすると、以下のように聞かれる。`今後は表示しない`でOK。
+![](/images/setup-zenn-github/vscode-push-confirm.png)
+これで[Zenn](https://zenn.dev/)のサイトに移動し、自分のアカウントから「記事の管理」で下書き状態が見れるようになっていたらOK。`published: true`に変更してステージング→コミット→再プッシュしたら完了です。
+> Zennのサイト上でも記事を更新できるが、Gitでの管理と競合するのでしないほうがいいです
+
+個人で書く分には、Gitに関しては上図の一方通行で十分だと思います。(別のPCでも記事を更新するときは、pullリクエストや競合の解決とか必要になってくるので、詳細はそのうち別記事に書きます)
