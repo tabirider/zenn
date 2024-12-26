@@ -314,6 +314,7 @@ VSCodeで編集できる.mdファイルはワーキングディレクトリ・�
 > git push
 # だけでOK。
 ```
+
 VS Codeからも可能。
 ![](/images/setup-zenn-github/vscode-push.png)
 `git push -u`してない状態でVS Codeから`変更の同期`しようとすると、以下のように聞かれる。`今後は表示しない`でOK。
