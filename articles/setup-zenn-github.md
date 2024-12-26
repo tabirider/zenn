@@ -271,14 +271,15 @@ Markdown記法は[公式](https://zenn.dev/zenn/articles/markdown-guide)参照�
 ブラウザで`http://localhost:8000`を開くと、.mdファイルを更新する度にプレビューも更新されていく。便利。
 これを実行しているPowreShellの窓を閉じると、プレビュー機能も停止するので注意。
 
-### Gitのステージング・コミット・プッシュ
-**(普段Git使わない人向け)**
+### Gitのステージング・コミット・プッシュ（記事の公開）
+> ↓普段Git使わない人向け
+
 Gitにはステージングという構造がある。
 ```mermaid
 flowchart LR
 subgraph ローカル環境
 A[working<br>directory<br>#040;編集可能#041;]
-B[staging<br>area]
+B[staging<br>area<br>#040;index#041;]
 C[local<br>repository]
 end
 subgraph GitHub
@@ -322,4 +323,7 @@ VS Codeからも可能。
 これで[Zenn](https://zenn.dev/)のサイトに移動し、自分のアカウントから「記事の管理」で下書き状態が見れるようになっていたらOK。`published: true`に変更してステージング→コミット→再プッシュしたら完了です。
 > Zennのサイト上でも記事を更新できるが、Gitでの管理と競合するのでしないほうがいいです
 
+VS Codeでは、GitHubのリポジトリがローカルリポジトリを追いかけている様子が見れます。
+![](/images/setup-zenn-github/vscode-branch.png)
+他にも[GitHub Desktop](https://github.com/apps/desktop)などGUIツールがいくつかあるので、好みのを使ってみてください。
 個人で書く分には、Gitに関しては上図の一方通行で十分だと思います。(別のPCでも記事を更新するときは、pullリクエストや競合の解決とか必要になってくるので、詳細はそのうち別記事に書きます)
