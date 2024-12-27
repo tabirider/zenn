@@ -15,7 +15,7 @@ Markdown記法のファイル(.md)を書いてGitHubに投げれば、自動でZ
 - Zenn CLIを導入すればブラウザでの見た目をリアルタイムでプレビューできる(便利)
 ## デメリット
 - Zenn CLI、Git、VSCode諸々PC毎にセットアップ必要
-- Node.jsのインストール必要(23年12月時点でv14以上)。毎年2回バージョン上がるので、人によっては環境競合するかも
+- Zenn CLIにはNode.jsのインストール必要。Node.jsは頻繁にバージョン上がるので、人によっては環境競合するかも
 - Gitにせよ何にせよWindowsで使うのは~~クソ~~面倒
 
 :::message
@@ -51,10 +51,11 @@ Gitのインストール前に入れておくのがおすすめ。[公式](https
 エディタは`Visual Studio Code`を選択
 `Override the default branch name for new repositories`が出たら`main`を選んでおく
 > BLMとかの関係で`master`は良くないよねって流れ。もうマスタースレーブとか言っちゃいけないって最近知りました。
->
-`Use external OpenSSH`を選択。Windows10からは`OpenSSH`が標準でバンドルされてるので、今回はそっちを使います。Gitとの連携手順は後ろの方を参照。他はそのまま`Next`で大丈夫。
 
-パスが通ってるか確認
+`Use external OpenSSH`を選択。Windows10からは`OpenSSH`が標準でバンドルされてるので、今回はそっちを利用。Gitとの連携手順は後ろの方を参照。他はそのまま`Next`で大丈夫。
+> SSHはGitHubとの暗号通信に必須。ここではRSAの公開鍵方式を使います。
+
+Gitへのパスが通ってるか確認
 PowerShellから
 ```powershell
 > git --version
@@ -204,6 +205,16 @@ WindowsのOpenSSHサービスは通常停止しているので、それを有効
 ```
 ![](/images/setup-zenn-github/setting-win-path-07.png)
 
+> オーソドックスに`ドキュメント`フォルダに作ってもOK。
+  その場合パスが`C:\Users\私の 名前\Documents\Zenn`みたいになるが問題ない。
+```powershell
+> cd ~\Documents\Zenn
+# これで"C:\Users\私の 名前\Documents\Zenn"に移動できる。
+# これを知るまでドキュメソトフォルダは絶対使わなかった。ちなみに
+> cd ~/Documents/Zenn
+# \じゃなくて/でも普通に動く。これもうわかんねぇな
+```
+
 ### Node.jsをインストール
 [公式サイト](https://nodejs.org/)参照
 セットアップ画面の中で、`Automatically install the necessary tools. ～`はチェックしなくてOK。
@@ -275,7 +286,7 @@ Markdown記法は[公式](https://zenn.dev/zenn/articles/markdown-guide)参照�
 > npx zenn preview
 ```
 ブラウザで`http://localhost:8000`を開くと、.mdファイルを更新する度にプレビューも更新されていく。便利。
-これを実行しているPowreShellの窓を閉じると、プレビュー機能も停止するので注意。また、以降もgit関係の操作をPowerShellで行う場合、別のPowerShellウィンドウを開こう。(同じように`Zenn`フォルダに`cd`しておくこと)
+これを実行しているPowreShellの窓を閉じると、プレビュー機能も停止するので注意。また、以降もgit関係の操作をPowerShellで行う場合、別のPowerShellウィンドウを開く。(同じように`Zenn`フォルダに`cd`しておく)
 
 ### Gitのステージング・コミット・プッシュ（記事の公開）
 > ↓普段Git使わない人向け
@@ -297,15 +308,16 @@ B -- commit --> C
 C -- push --> D
 D <-- 連携 --> E
 ```
-VSCodeで編集できる.mdファイルはワーキングディレクトリ・作業ツリーと呼ばれ、そこからステージングエリアに移動(`add`)させてから、ローカルリポジトリにコミット(`commit`)する(必要なファイルだけコミットしたりする仕組み。ステージングはファイル単位、コミットはまとめて、のイメージ)。そこから更に`push`してGitHubに辿り着く。
+> VSCodeで編集してる.mdファイルがいる場所はワーキングディレクトリ・作業ツリーと呼ばれ、そこからステージングエリアに移動(`add`)させてからローカルリポジトリにコミット(`commit`)する(必要なファイルだけコミットしたり、競合を解決する仕組み。ステージングはファイルや行単位、コミットはまとめて、のイメージ)。そこから更に`push`してGitHubに辿り着く。`.md`ファイルの編集くらいならファイル単位でボコボコ`add`して`commit`すればOK。
 
 ファイルをステージングエリアに移動：
 ```powershell
+> cd D:\Zenn\                       #まずZennフォルダに移動
 > git add .\articles\(ファイル名).md #特定のファイルをステージング
 > git add .\articles\               #articles内の全ファイルをステージング
 > git add .                         #Zennフォルダ下にある全ファイルをステージング
 ```
-または、Visual Studio CodeでGitHub Pull Requestsを導入していれば、`ソース管理`から変更したファイルの`+`マークでステージングできる。
+または、Visual Studio Codeで~~GitHub Pull Requestsを導入していれば~~(←なくてもOKだった)、`ソース管理`から変更したファイルの`+`マークでステージングできる。
 ![](/images/setup-zenn-github/vscode-staging.png)
 ステージングが完了したら、ローカルリポジトリにコミットする。
 ```powershell
@@ -326,10 +338,11 @@ VS Codeの`変更の同期`でも同じ操作になる。
 ![](/images/setup-zenn-github/vscode-push.png)
 `git push -u`してない状態でVS Codeから`変更の同期`しようとすると、以下のように聞かれる。`今後は表示しない`でOK。
 ![](/images/setup-zenn-github/vscode-push-confirm.png)
-これで[Zenn](https://zenn.dev/)のサイトに移動し、自分のアカウントから「記事の管理」で下書き状態が見れるようになっていたらOK。`published: true`に変更してステージング→コミット→再プッシュしたら完了です。
-> Zennのサイト上でも記事を更新できるが、Gitでの管理と競合するのでしないほうがいいです
+これで[Zenn](https://zenn.dev/)のサイトに移動し、自分のアカウントから「記事の管理」で下書き状態が見れるようになったらOK。`published: true`に変更してステージング→コミット→再プッシュして完了。
+> Zennのサイト上でも記事を更新できるが、Gitで再pushすると上書きされる
 
-VS Codeでは、GitHubのリポジトリがローカルリポジトリを追いかけている様子が見れます。
+VS Codeでは、GitHubのリポジトリがローカルリポジトリを追いかけてる様子が見れる。
 ![](/images/setup-zenn-github/vscode-branch.png)
-他にも[GitHub Desktop](https://github.com/apps/desktop)などGUIツールがいくつかあるので、好みのを使ってみてください。
-個人で書く分には、Gitに関しては上図の一方通行で十分だと思います。(別のPCでも記事を更新するときは、pullリクエストや競合の解決とか必要になってくるので、詳細はそのうち別記事に書きます)
+
+> 他にも[GitHub Desktop](https://github.com/apps/desktop)などGUIツールがいくつかあるので、好みのを使ってみてください。
+  個人で書く分には、Gitに関しては上図の一方通行で十分だと思います。(別のPCでも記事を更新するときは、pullリクエストや競合の解決とか必要になってくるので、詳細はそのうち別記事に書きます)

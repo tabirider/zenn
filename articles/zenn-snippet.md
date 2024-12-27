@@ -5,11 +5,14 @@ type: "idea" # tech: 技術記事 / idea: アイデア
 topics: ["zenn"]
 published: false
 ---
-<!-- 見出し -->
+
+````markdown
+<!-- コメント(1行のみ) -->
+
 ## 見出し
 ### 見出し
 #### 見出し
-<!-- リスト -->
+
 - リスト
 - リスト
   - リスト(ネスト)
@@ -19,34 +22,34 @@ published: false
     1. 番号付きリスト(ネスト)
         リストの中の記事
 
-<!-- リンク -->
-[アンカーテキスト](https://www.google.co.jp/)
+# リンク
+[アンカーテキスト](https://www.google.co.jp)
+<https://www.google.co.jp>
 
-<!-- 画像 -->
+# 画像
 ![](/images/zenn-snippet/sample.png)
+
+# リンク付き画像
 [![](/images/zenn-snippet/linked-image.png)](https://www.google.co.jp/)
 
-<!-- テーブル -->
+# テーブル
 |head|head|
 |--|--|
 |text|text|
 
-<!-- コードブロック -->
+# コードブロック
+```
+code
+```
+
+    行頭スペース4個でもコード記法になる
+
 ```python
-print(id(hoge))
+print('hoge')
 ```
 
 ```python:hoge.py
 print('hoge')
-```
-
-```
-コードブロックに指定できるハイライト:
-https://prismjs.com/#supported-languages
-html, css, js, c, cpp, csv, diff, docker, git, gitignore, go, http,
-java, json, json5, jsonp, kotlin, log, md or markdown, mermaid, mongodb,
-nginx, prel, php, plsql, powershell, py, shell-session, sql, tcl,
-typescript or ts, url, wiki, yaml, etc.
 ```
 
 ```diff js
@@ -55,32 +58,36 @@ typescript or ts, url, wiki, yaml, etc.
     let foo = bar.baz([1, 2, 3]);
 ```
 
-<!-- 数式 -->
+# コードブロックに指定できるハイライト:
+<https://prismjs.com/#supported-languages>
+html, css, js, c, cpp, csv, diff, docker, git, gitignore, go, http,
+java, json, json5, jsonp, kotlin, log, md or markdown, mermaid, mongodb,
+nginx, prel, php, plsql, powershell, py, shell-session, sql, tcl,
+typescript or ts, url, wiki, yaml, etc.
+
+# 数式
 [KaTeX](https://katex.org/docs/support_table.html)
 
-<!-- 数式ブロック -->
-
+# 数式ブロック
 $$
 e^{i\theta} = \cos\theta + i\sin\theta
 $$
 
-インラインの$a\ne0$数式埋め込み
+# インラインの$a\ne0$数式埋め込み
 
-<!-- 引用 -->
+#  引用
 > 引用文
 
-<!-- 脚注 -->
+# 脚注
 脚注[^1]の例。
 インライン^[インラインの脚注の内容]も可能。
 
 [^1]: 脚注の内容
 
-<!-- 区切り線 -->
+# 区切り線
 ---
 
-インライン*italic*、**太字**, ~~取り消し線~~, `code`
-
-<!-- Zenn独自拡張 -->
+# Zenn独自拡張
 ::::message
 メッセージ
 ::::
@@ -99,27 +106,85 @@ $$
 
 :::::details いろいろネスト
   ::::message
-  メッセージ
+  ネストしたメッセージ
   :::message alert
   さらにネスト
   :::
   ::::
 :::::
 
-<!-- カード -->
+# カード
 https://www.yahoo.co.jp
-<!-- カードがうまくいかない場合 -->
+
+# カードがうまくいかない場合
 @[card](https://www.yahoo.co.jp)
-<!-- リンクのみ -->
+
+# リンクのみ
 <https://www.yahoo.co.jp>
 
-<!-- YouTube -->
+# X
+https://x.com/jack/status/20
+?conversation=noneでリプライ元ポスト非表示
 
+# YouTube
 https://www.youtube.com/watch?v=x3qaFHhh1jQ
 
-<!-- GitHub -->
-[github-sample/sample.txt](https://github.com/tabirider/zenn/blob/d45918a9ab42869fee0da3f2ca283e952e93dafc/github-sample/sample.txt)
-
+# GitHub
+ファイル単位
 https://github.com/tabirider/zenn/blob/d45918a9ab42869fee0da3f2ca283e952e93dafc/github-sample/sample.txt
 
+特定行
 https://github.com/tabirider/zenn/blob/d45918a9ab42869fee0da3f2ca283e952e93dafc/github-sample/sample.txt#L3-L5
+
+1行だけ
+https://github.com/tabirider/zenn/blob/d45918a9ab42869fee0da3f2ca283e952e93dafc/github-sample/sample.txt#L3
+
+# GitHub Gist
+<https://gist.github.com>
+
+@[gist](https://gist.github.com/tabirider/d16b2087fe404e2ca60b1ab7eb9308d8)
+
+# CodePen(フロントエンド)
+<https://codepen.io>
+@[codepen](ページのURL)
+
+# SlideShare(スライドをシェア)
+<https://www.slideshare.net>
+@[slideshare](スライドのkey)
+埋め込みコードに含まれるdata-idの値を入力
+
+# Docswell(スライドをシェア)
+<https://www.docswell.com>
+@[docswell](スライドのURL)
+もしくは
+@[docswell](埋め込み用のURL)
+#スライドのURL（ https://www.docswell.com/s/{UserId}/{SlideId}-xxx-xxx ）、もしくは埋め込み用のURL( https://www.docswell.com/slide/{SlideId}/embed )を入力
+
+# JSFiddle(フロントエンド)
+<https://jsfiddle.net>
+@[jsfiddle](ページのURL)
+埋め込みオプションを指定する場合、iframe用の埋め込みURL(ページのURL+/embedded/{Tabs}/{Visual}/)を入力
+
+# StackBlitz(フロントエンド)
+<https://stackblitz.com>
+@[stackblitz](embed用のURL)
+
+# Figma(デザインツール)
+<https://www.figma.com/ja-jp>
+@[figma](ファイルまたはプロトタイプのURL)
+
+# blueprintUEは使わないので省略
+
+# mermaid
+<https://mermaid.js.org/ecosystem/tutorials.html>
+```mermaid
+graph TB
+    A[Hard edge] -->|Link text| B(Round edge)
+    B --> C{Decision}
+    C -->|One| D[Result one]
+    C -->|Two| E[Result two]
+```
+クリックイベント無効、ブロックあたり2000文字、ブロックあたりのChain数10以下
+
+
+````
