@@ -116,21 +116,21 @@ C:\Users\(ユーザ名)\.gitconfig       # ユーザ毎。メールアドレス�
 ```
 
 ### GitHubにSSHキー登録
-まず鍵作る。パスフレーズは省略できる(が非推奨)。
+まず鍵作る。パスフレーズは省略できる(が非推奨)。鍵は接続先毎に変えておきたいのでファイル名を明示する。
 ```powershell
-> ssh-keygen -t rsa -b 4096 -C "自分のmail@address"
-# 鍵を作るフォルダを指定。もう↓\と/がごっちゃになってますね
-Enter file in which to save the key (C:\Users\(ユーザ名)/.ssh/id_rsa): #そのままEnter
+# Windows環境でssh-keygenを使うときは、'~/'を解釈してくれないので代わりに$HOMEを使う
+# $HOMEはC:\Users\(ユーザ名)に相当する
+> ssh-keygen -t rsa -b 4096 -C "自分のmail@address" -f $HOME\.ssh\id_rsa_github
 Enter passphrase (empty for no passphrase): #任意のパスフレーズを入力(覚えておく)
 Enter same passphrase again: #もっかい入力
 ```
 これで秘密鍵と公開鍵ができるので、公開鍵をGitHubに登録。公開鍵の場所は
 ```powershell
-C:\Users\(ユーザ名)\.ssh\id_rsa.pub
+C:\Users\(ユーザ名)\.ssh\id_rsa_github.pub
 ```
 エクスプローラだと`PC`→`Windows(C:)`→`ユーザー`→(ユーザ名)→`.ssh`で辿れる。
 ![](/images/setup-zenn-github/id_rsa.png)
-`id_rsa.pub`ファイルを適当なテキストエディタで開いて(テキストエディタを入れてなければ「メモ帳」を開いて`id_rsa.pub`ファイルをドラッグ&ドロップすればOK)、「中身の`ssh-rsa ～～～`のテキスト」を丸ごとコピー。
+`id_rsa_github.pub`ファイルを適当なテキストエディタで開いて(テキストエディタを入れてなければ「メモ帳」を開いて`id_rsa_github.pub`ファイルをドラッグ&ドロップすればOK)、「中身の`ssh-rsa ～～～`のテキスト」を丸ごとコピー。
 GitHubのサイトから右上のアイコン→`Settings`→`SSH and GPG keys`→`New SSH key`で`Key`にコピーしたテキストをそのまま貼り付け→`Add SSH key`
 
 ### OpenSSHエージェントサービスの有効化
@@ -143,7 +143,7 @@ WindowsのOpenSSHサービスは通常停止しているので、それを有効
     Host github.com
       HostName github.com
       User git
-      IdentityFile ~/.ssh/id_rsa
+      IdentityFile ~/.ssh/id_rsa_github
       AddKeysToAgent yes
     ```
 
@@ -152,7 +152,7 @@ WindowsのOpenSSHサービスは通常停止しているので、それを有効
     |Host|SSH接続時の名前(エイリアス)。`github.com`の代わりに`gh`にすると、SSH接続を`ssh gh`みたいに書ける|
     |HostName|リモートホストの指定。IPアドレスでもOK|
     |User|SSH接続のユーザ名。GitHubは`git`ユーザで接続する決まりなので、変えると接続できない|
-    |IdentityFile|さっき作った鍵の片割れ(秘密鍵のほう)を指定。ちなみにWindows環境での`~/`は`C:\Users\(ユーザ名)\`を意味する。ドキュメソト フォルダではないので注意|
+    |IdentityFile|さっき作った鍵の片割れ(秘密鍵のほう)を指定。パスは\じゃなくて/なので注意。ちなみにWindows環境での`~/`は`C:\Users\(ユーザ名)\`を意味する|
     |AddKeysToAgent|yesを指定するとOpenSSHエージェント(この下の手順で起動するサービス)がSSHキーを覚えてくれる。パスフレーズも記憶してくれるが、パスフレーズはメモリ上に持つだけなので再起動後はまた聞かれる|
 
 2.  OpenSSH Authentication Agentを起動
@@ -178,7 +178,7 @@ WindowsのOpenSSHサービスは通常停止しているので、それを有効
     # 既知のホストとして登録されたよ
     Warning: Permanently added 'github.com' (ED25519) to the list of known hosts.
     # 最初はパスフレーズを聞かれるので入力
-    Enter passphrase for key 'C:\Users\(ユーザ名)/.ssh/id_rsa':
+    Enter passphrase for key 'C:\Users\(ユーザ名)/.ssh/id_rsa_github':
     # これが出たらSSH接続成功
     Hi (ユーザ名)! You ve successfully authenticated, but GitHub does not provide shell access.
     > ssh -T git@github.com
@@ -194,7 +194,7 @@ WindowsのOpenSSHサービスは通常停止しているので、それを有効
     ```
 
 ### 記事を管理するフォルダを作成
-**Zennの記事管理に使うフォルダ**を作成。このフォルダは同時に**Gitのローカルリポジトリ**にもなる。(ここでは`D:\Zenn`とする。エクスプローラで作ってもOK)
+**Zennの記事管理に使うフォルダ**を作成。このフォルダは同時に**Zenn CLIのためのNode.jsプロジェクトフォルダ**で、**Gitのローカルリポジトリ**にもなる。(ここでは`D:\Zenn`とする。エクスプローラで作ってもOK)
 ```powershell
 > mkdir D:\Zenn
 # ちなみにmkdirはPowerShellのコマンドレットNew-Itemのエイリアス。
@@ -308,7 +308,7 @@ B -- commit --> C
 C -- push --> D
 D <-- 連携 --> E
 ```
-> VSCodeで編集してる.mdファイルがいる場所はワーキングディレクトリ・作業ツリーと呼ばれ、そこからステージングエリアに移動(`add`)させてからローカルリポジトリにコミット(`commit`)する(必要なファイルだけコミットしたり、競合を解決する仕組み。ステージングはファイルや行単位、コミットはまとめて、のイメージ)。そこから更に`push`してGitHubに辿り着く。`.md`ファイルの編集くらいならファイル単位でボコボコ`add`して`commit`すればOK。
+> VSCodeで編集してる.mdファイルがいる場所はワーキングディレクトリ・作業ツリーと呼ばれ、そこからステージングエリアに移動(`add`)させてからローカルリポジトリにコミット(`commit`)する(必要なファイルだけコミットしたり、競合を解決する仕組み。ステージングはファイルや行単位、コミットはまとめて、のイメージ)。そこから更に`push`してGitHubに辿り着く。`.md`ファイルの編集くらいならファイル単位でボコボコ`add`して`commit`して`push`すればOK。
 
 ファイルをステージングエリアに移動：
 ```powershell
@@ -325,7 +325,7 @@ D <-- 連携 --> E
 ```
 またはVS Codeから
 ![](/images/setup-zenn-github/vscode-commit.png)
-これでローカルリポジトリが更新されたが、まだGitHubには反映されていない。これからの手順は、まず`.md`ファイルの`published: false`で非公開状態にして試すのがオススメ。
+これでローカルリポジトリが更新されたが、まだGitHubには反映されていない。まず`.md`ファイルの`published: false`で非公開状態にして試すのがオススメ。
 ```powershell
 # 最初は-uオプションでローカルリポジトリのmainとGitHubのリモートリポジトリを紐づける。
 > git push -u origin main
