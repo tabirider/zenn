@@ -124,6 +124,15 @@ C:\Users\(ユーザ名)\.gitconfig       # ユーザ毎。メールアドレス�
 Enter passphrase (empty for no passphrase): #任意のパスフレーズを入力(覚えておく)
 Enter same passphrase again: #もっかい入力
 ```
+
+```powershell
+# もし作成済の鍵と名前が被ったら
+Generating public/private rsa key pair.
+C:\Users\(ユーザ名)\.ssh\id_rsa_github already exists.
+Overwrite (y/n)?
+# と聞かれる。 GitHubへの鍵登録が済んでいればこの手順はパス。
+```
+
 これで秘密鍵と公開鍵ができるので、公開鍵をGitHubに登録。公開鍵の場所は
 ```powershell
 C:\Users\(ユーザ名)\.ssh\id_rsa_github.pub
