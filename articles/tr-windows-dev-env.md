@@ -223,7 +223,7 @@ $ sudo --help
 > Docker Desktop では何らかの Linux ディストリビューションをインストールする必要はありません。 docker CLI と UI は追加の Linux ディストリビューションがなくても動作します。しかしながら、**最高の開発体験を得るためには、少なくとも１つのディストリビューションを追加**し、次のようにして Docker サポートを有効化するのを推奨します。
 
 ？結局、何かのdistro入れろってなってる。確かにDocker Desktopでも、
-![](/images/windows-dev-env/docker-desktop-select-dist.png)
+![](/images/tr-windows-dev-env/docker-desktop-select-dist.png)
 どのdistro使うか選択できるみたい。
 ？？そんならdocker-desktopって要らなくね？？
 
