@@ -266,5 +266,5 @@ class X11,VCXSRV disabled
 classDef disabled fill:#ccc,stroke-dasharray:5 5, stroke:#666
 ```
 VisualStudio CodeからWSL拡張機能でWSL上のファイルシステムにアクセスできるし、Docker拡張機能でコンテナ内に直接アタッチできるしPython拡張機能でデバッグもできる(Dockerを使わずcontainerdだけだと、コンテナ内にSSH立てて経由する必要がある。このあたりDockerの方がやっぱり便利)。
-WindowsにVcXsrvを入れれば、X Windows SystemからDISPLAYポート経由でLinuxデスクトップを使えることも確認した(けど必要性はないので満足して終わった)。
+WindowsにVcXsrvを入れれば、X Window SystemからDISPLAYポート経由でLinuxデスクトップを使えることも確認した(けど必要性はないので満足して終わった)。
 具体的な手順は別記事に。
