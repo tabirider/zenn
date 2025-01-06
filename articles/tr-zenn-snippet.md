@@ -60,7 +60,7 @@ print('hoge')
 
 # コードブロックに指定できるハイライト:
 <https://prismjs.com/#supported-languages>
-html, css, js, c, cpp, csv, diff, docker, git, gitignore, go, http,
+html, css, js, bash, c, cpp, csv, diff, docker, git, gitignore, go, http,
 java, json, json5, jsonp, kotlin, log, md or markdown, mermaid, mongodb,
 nginx, prel, php, plsql, powershell, py, shell-session, sql, tcl,
 typescript or ts, url, wiki, yaml, etc.

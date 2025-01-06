@@ -285,6 +285,12 @@ origin  git@github.com:～～/～～.git (push)
 > npx zenn new:article --slug file-name-of-text
 ```
 のようにslugだけは指定したほうがいい。(英数・ハイフン・アンスコ12〜50文字)
+
+:::message alert
+slugはユーザ内じゃなくてZenn全体でユニークである必要があります(知らんかった)。競合発生した場合の対処は後ろの方を参照。
+[soags](https://zenn.dev/soags)さんが[slug衝突判定](https://zenn.dev/soags/articles/zenn-create-96644c4bc7a0fd)を作られてます。
+:::
+
 Visual Studio Codeから`ファイル`→`フォルダーを開く`で`Zenn`フォルダーを開いて、`article`フォルダの下にできた.mdファイルを更新していく。
 Markdown記法は[公式](https://zenn.dev/zenn/articles/markdown-guide)参照。
 
@@ -355,3 +361,10 @@ VS Codeでは、GitHubのリポジトリがローカルリポジトリを追い�
 
 > 他にも[GitHub Desktop](https://github.com/apps/desktop)などGUIツールがいくつかあるので、好みのを使ってみてください。
   個人で書く分には、Gitに関しては上図の一方通行で十分だと思います。(別のPCでも記事を更新するときは、pullリクエストや競合の解決とか必要になってくるので、詳細はそのうち別記事に書きます)
+
+## slugの競合が発生した場合
+
+もしslugが他の人と重複した場合、GitHubにpushするとZennサイトにエラーが出る。
+![](/images/setup-zenn-github/slug-duplicated.png)
+この場合、`.md`ファイルのslug(ファイル名)を変更し再push。
+(ファイル名を変更するとGitはファイルの追加・削除と認識するので、追加と削除ファイルの両方を`add`(ステージング)→`commit`→`push`)
