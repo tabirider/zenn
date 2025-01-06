@@ -78,7 +78,7 @@ Dockerfileの例:
 ```dockerfile:Dockerfile
 # Python Dockerイメージをベースに利用
 FROM python:3.13.1-slim
-# pipのアップグレードとNumPyのインストール
+# GitやNumPyインストール(環境変更はここに書き足すだけ)
 RUN apt update && apt install -y git && \
     apt-get clean && rm -rf /var/lib/apt/lists/* && \
     pip install --no-cache-dir numpy
