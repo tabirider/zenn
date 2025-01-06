@@ -22,7 +22,7 @@ WSLの挙動を定義するconfファイル。2種類ある。詳細は[MSサイ
 
 ## .wslconfig
 **WSL全体に影響するパラメータ**。
-配置場所はWindowsの`C:\Users\(ユーザ名)\.wslconfig`。このファイルはデフォルトで存在しないので、必要なら手作業で作成。**記述にエラーがあると無視してデフォルト値でWSLが起動する**。
+配置場所はWindowsの`C:\Users\(ユーザ名)\.wslconfig`。このファイルはデフォルトで存在しないので、必要なら手作業で作成。**記述にエラーがあると無視してデフォルト値でWSLが起動する**。Windowsかよ。
 
 ```:.wslconfig
 [wsl2]
@@ -44,7 +44,7 @@ processors=2
 |safeMode|boolean|false|WSLをセーフモードで実行|
 |swap|size|Windowsメモリの25%|WSLに追加するスワップ領域、スワップファイルなければ0|
 |swapFile|path|%USERPROFILE%\ <br>AppData\Local\ <br>Temp\swap.vhdx|スワップ仮想diskへのパス<br>デフォ値はMSサイトでは←だが、実際には`C:\Users\takak\AppData\Local\Temp\なんかごちゃごちゃしたところ\swap.vhdx`<br>**`swap.vhdx`検索、あとは更新日付で探す。このフォルダはゴミ溜まるので注意**|
-|pageReporting|boolean|true|WindowsにWSLの未使用のメモリ再利用を許可|
+|pageReporting|boolean|true|WindowsにWSL未使用メモリの再利用を許可|
 |guiApplications|boolean|true|WSLでのGUI(WSLg)サポート|
 |debugConsole|boolean|false|distro開始時dmesgのコンソール出す(win11)|
 |nestedVirtualization|boolean|true|WSLで入れ子VMを許可(win11)|
@@ -74,13 +74,15 @@ key = value
 ～～
 ```
 
-### systemd サポート
+### systemd サポート・コマンド実行
 
-多くのdistro(Ubuntu含む)は既定でsystemdが実行される。
 セクション ラベル: [boot]
+
 |key|value|default|内容|
 |--|--|--|--|
-|systemd|boolean|true|systemdを起動<br>(Ubuntuでは指定省略してもsystemdが上がるのを確認)|
+|systemd|boolean|true|systemdを起動|
+|command|string|""|WSLインスタンス開始時の実行コマンド(rootで実行される。複数指定不可、その場合はシェルスクリプトを指定。win11)<br>command = /path/to/script.sh|
+
 
 ### 自動マウントの設定
 
@@ -133,16 +135,6 @@ optionsの詳細
 |key|value|default|内容|
 |--|--|--|--|
 |default|string|初回作成時のユーザ名|WSL開始時に使用されるユーザー|
-
-### ブート設定
-
-**(Windows11 or Server2022のみ)**
-
-セクション ラベル: [boot]
-
-|key|value|default|内容|
-|--|--|--|--|
-|command|string|""|WSLインスタンス開始時の実行コマンド(rootで実行される。複数指定不可、その場合はシェルスクリプトを指定)<br>**command内のパスはWSL内の絶対パスで指定**|
 
 
 ## WSLアップデート・Ubuntu導入
