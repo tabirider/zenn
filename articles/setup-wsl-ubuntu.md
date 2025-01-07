@@ -61,7 +61,7 @@ processors=2
 
 ### 試験的な設定
 
-[色々便利そう](https://learn.microsoft.com/ja-jp/windows/wsl/systemd#how-does-enabling-systemd-affect-wsl-architecture)。時々チェック。
+[色々便利そう](https://learn.microsoft.com/ja-jp/windows/wsl/wsl-config#experimental-settings)。時々チェック。
 
 
 ## wsl.conf
@@ -80,7 +80,7 @@ key = value
 
 |key|value|default|内容|
 |--|--|--|--|
-|systemd|boolean|true|systemdを起動|
+|systemd|boolean|**なし**|trueで[systemdを起動](https://learn.microsoft.com/ja-jp/windows/wsl/wsl-config#systemd-support)。これを設定しないとsystemdは有効にならない|
 |command|string|""|WSLインスタンス開始時の実行コマンド(rootで実行される。複数指定不可、その場合はシェルスクリプトを指定。win11)<br>command = /path/to/script.sh|
 
 
@@ -92,7 +92,7 @@ Win⇔WSL2はパフォーマンス悪いので注意。あまり使いたくな�
 
 |key|value|default|内容|
 |--|--|--|--|
-|enabled|boolean|true|trueで固定ドライブ (C:/とか)が/mnt下にマウント。falseでもfstabで個別にマウントできる|
+|enabled|boolean|true|trueで固定ドライブ (C:/とか)が/mnt下にマウント。falseでもfstabで個別にマウントできる。これをfalseにすると**VS CodeからWSL拡張機能で接続できなくなる**|
 |mountFsTab|boolean|true|WSL開始時に処理されるよう/etc/fstab(SMB=Server Message Block共有など他のファイル システムを宣言するもの)を設定|
 |root|string|/mnt/|Win固定ドライブマウントのエントリポイント|
 |options|以下参照|""|マウントしたWindowsファイルシステムに対するオプションの指定<br>`options = "metadata,uid=1003,gid=1003,umask=077,fmask=11,case=off"～`|
