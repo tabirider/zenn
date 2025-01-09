@@ -43,12 +43,12 @@ processors=2
 |kernelCommandLine|string|Blank|追加のカーネルコマンドライン引数|
 |safeMode|boolean|false|WSLをセーフモードで実行|
 |swap|size|Windowsメモリの25%|WSLに追加するスワップ領域、スワップファイルなければ0|
-|swapFile|path|%USERPROFILE%\ <br>AppData\Local\ <br>Temp\swap.vhdx|スワップ仮想diskへのパス<br>デフォ値はMSサイトでは←だが、実際には`C:\Users\takak\AppData\Local\Temp\なんかごちゃごちゃしたところ\swap.vhdx`<br>**`swap.vhdx`検索、あとは更新日付で探す。このフォルダはゴミ溜まるので注意**|
+|swapFile|path|%USERPROFILE%\ <br>AppData\Local\ <br>Temp\swap.vhdx|スワップ仮想diskへのパス<br>デフォはMSサイトの説明では←だが実際には`C:\Users\takak\AppData\Local\Temp\なんかごちゃごちゃしたところ\swap.vhdx`<br>通常は`wsl --shutdown`で削除されるが時々ゴミが残る。場所は`Temp`内を`swap.vhdx`で検索するのが早い|
 |pageReporting|boolean|true|WindowsにWSL未使用メモリの再利用を許可|
 |guiApplications|boolean|true|WSLでのGUI(WSLg)サポート|
 |debugConsole|boolean|false|distro開始時dmesgのコンソール出す(win11)|
 |nestedVirtualization|boolean|true|WSLで入れ子VMを許可(win11)|
-|vmIdleTimeout|数値|60000|VMがアイドル状態になってからシャットダウンされるまでのミリ秒(win11)<br>[WSLではsystemdがインスタンスを維持しない](https://learn.microsoft.com/ja-jp/windows/wsl/systemd#how-does-enabling-systemd-affect-wsl-architecture)。DOS窓閉じたら1分後に落ちる、Windowsみ深い。0にしたら10秒くらいで落ちる|
+|vmIdleTimeout|数値|60000|VMがアイドル状態になってからシャットダウンされるまでのミリ秒(win11)<br>[WSLではsystemdがインスタンスを維持しない](https://learn.microsoft.com/ja-jp/windows/wsl/systemd#how-does-enabling-systemd-affect-wsl-architecture)ので**シェルから抜けたら1分後にdistro自体が落ちる**、Windowsみ深い。0にしたら落ちなくなるかと思ったら10秒くらいで落ちる、無制限の設定はできないっぽい？|
 |dnsProxy|boolean|true|`networkingMode=NAT`時ホストのNATに対してLinuxのDNSサーバーを構成。false時はWindowsからLinuxにDNSサーバミラーリング|
 |networkingMode|string|NAT|`mirrored`でネットワークモードミラー化(win11/22H2～)|
 |firewall|boolean|true|true時Winファイアウォール＋Hyper-V固有規則でフィルタ(win11/22H2～)|
@@ -182,12 +182,16 @@ $ exit
 WSLまわりのコマンド：
 
 ```powershell
+> wsl -l --online           #導入可能なdistroのリスト
+> wsl -l --verbose          #distroの実行状態を確認
 > wsl -u root -d Ubuntu     #rootでログイン
 > wsl --terminate Ubuntu    #Ubuntuを終了
 > wsl --set-default Ubuntu  #既定distroをUbuntuに(複数distro導入してるとき)
 > wsl                       #既定distroに既定ユーザで入る
 > wsl --shutdown            #全distroを終了
 ```
+
+なお`wsl --shutdown`しても、例えばVisual Studio Code等からWSLにアタッチしていると**勝手にWSLが再起動**するもよう。味わい深い。
 
 ちなみにWSL上のファイルはWindowsの
 ![](/images/setup-wsl-ubuntu/wsl_vhdx_locate.png)

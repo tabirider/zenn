@@ -239,32 +239,34 @@ flowchart TB
 subgraph LOCAL[ローカル環境]
   direction TB
   WINDOWS[Windows]
-  WSL[WSL2]
-  UBUNTU[Ubuntu]
-  DOCKER[Docker]
-  CONTAINER[コンテナ]
+  subgraph WSL[WSL2]
+    subgraph UBUNTU[Ubuntu]
+      SRC[ローカルリポジトリ等<br>永続化するもの]
+      subgraph DOCKER[Docker]
+        IMG[Docker<br>イメージ]
+        CONTAINER[Docker<br>コンテナ]
+      end
+      X11[X Window System]
+    end
+  end
   VSCODE[VisualStudio<br>Code]
-  X11[X Window System]
   VCXSRV[VcXsrv]
 end
-DOCKERHUB[DockerHub]
 GITHUB[GitHub]
-WINDOWS --> WSL
-WSL --> UBUNTU
-UBUNTU --> DOCKER
-DOCKER --> CONTAINER
+DOCKERHUB[DockerHub]
 WINDOWS --> VSCODE
 VSCODE -- WSL<br>拡張機能 --> WSL
 VSCODE -- Docker<br>拡張機能 --> CONTAINER
+IMG --> CONTAINER
 CONTAINER -.-> X11
 X11 -.-> VCXSRV
 VCXSRV -.-> WINDOWS
-DOCKERHUB -- ベースイメージ<br>引き込み --> DOCKER
-CONTAINER -- push --> GITHUB
-CONTAINER -- マウント --> WSL
+DOCKERHUB -- ベースイメージ<br>引き込み --> IMG
+SRC -- push --> GITHUB
+CONTAINER -- マウント --> SRC
 class X11,VCXSRV disabled
 classDef disabled fill:#ccc,stroke-dasharray:5 5, stroke:#666
 ```
-VisualStudio CodeからWSL拡張機能でWSL上のファイルシステムにアクセスできるし、Docker拡張機能でコンテナ内に直接アタッチできるしPython拡張機能でデバッグもできる(Dockerを使わずcontainerdだけだと、コンテナ内にSSH立てて経由する必要がある。このあたりDockerの方がやっぱり便利)。
+VisualStudio CodeからWSL拡張機能でWSL上のファイルシステムにアクセスできるし、Docker拡張機能でコンテナ内に直接アタッチできるしPython拡張機能でデバッグもできる(Dockerを使わずcontainerdだけだと、コンテナ内にSSH立てて経由する必要がある。このあたりDockerの方がやっぱり便利)。GitのローカルリポジトリはUbuntu上に作成し、コンテナ側からアタッチすることでコンテナを乗り換えても保存される。
 WindowsにVcXsrvを入れれば、X Window SystemからDISPLAYポート経由でLinuxデスクトップを使えることも確認した(けど必要性はないので満足して終わった)。
 具体的な手順は別記事に。

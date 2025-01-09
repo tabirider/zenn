@@ -37,7 +37,7 @@ Windows環境でLinux出自のgitコマンドとか使うと「\」と「/」が
 
 ### GitHubでリポジトリ作成
 GitHubの`Dashboard`から`Top repositories`→`New`でリポジトリ名を入力。
-`Public`でも`Private`でもOK。`README`ファイル→不要、`.gitignore`→`None`、`licence`→`None`でOK。
+`Public`でも`Private`でもOK。`README`ファイル→不要、`.gitignore`→`None`、`licence`→`None`でOK。`Create repository`。
 
 ### ZennとGitHubの連携
 [公式](https://zenn.dev/zenn/articles/connect-to-github)参照。
