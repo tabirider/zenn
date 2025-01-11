@@ -16,7 +16,7 @@ WindowsのWSL(Windows Subsystem for Linux)は2020年Ver2になり、Hyper-V仮�
 |--|--|--|
 |カーネル|擬似的なLinuxカーネル、互換性問題の可能性|Hyper-Vで動作する本物のカーネル|
 |ファイルシステム|Windows管理下|仮想ファイルシステムでLinux準拠|
-|Windowsファイルシステムとの連携|そのまま|激遅になる|
+|Windowsファイルシステムとの連携|そのまま|遅い。ファイル数多いと顕著|
 
 WSL自体はLinuxじゃなくてプラットフォーム。ディストリビューションを選べるし複数distro共存も可能。
 
@@ -128,7 +128,7 @@ class dockershim ds
 classDef ds fill:#cfc,stroke:#6f6
 ```
 
-で、実際にはDockerは内部でcontainerd(コンテナ管理を担当する中間レイヤ)、runc(コンテナを実行する低レベルランタイム)を利用している(どっちもDocker製)。これらの存在はDocker使ってて意識することはない。
+で、実際にはDockerは内部でcontainerd(コンテナ管理を担当する中間レイヤ)、runc(コンテナを実行する低レベルランタイム)を利用している(どっちもDocker製、現在はオープンソース化)。これらの存在はDocker使ってて意識することはない。
 
 ```mermaid
 ---
@@ -267,6 +267,6 @@ CONTAINER -- マウント --> SRC
 class X11,VCXSRV disabled
 classDef disabled fill:#ccc,stroke-dasharray:5 5, stroke:#666
 ```
-VisualStudio CodeからWSL拡張機能でWSL上のファイルシステムにアクセスできるし、Docker拡張機能でコンテナ内に直接アタッチできるしPython拡張機能でデバッグもできる(Dockerを使わずcontainerdだけだと、コンテナ内にSSH立てて経由する必要がある。このあたりDockerの方がやっぱり便利)。GitのローカルリポジトリはUbuntu上に作成し、コンテナ側からアタッチすることでコンテナを乗り換えても保存される。
+VisualStudio CodeからWSL拡張機能でWSL上のファイルシステムにアクセスできるし、Dev Containers拡張機能でコンテナ内に直接アタッチできるし、Docker拡張機能でDocker Desktopに近いことできるし、Python拡張機能でデバッグもできる(Dockerを使わずcontainerdだけだと、コンテナ内にSSH立てて経由する必要がある。このあたりDockerの方がやっぱり便利)。GitのローカルリポジトリはホストOSになるUbuntu上に作成し、コンテナ側からマウントすることでコンテナを乗り換えても保存される。
 WindowsにVcXsrvを入れれば、X Window SystemからDISPLAYポート経由でLinuxデスクトップを使えることも確認した(けど必要性はないので満足して終わった)。
 具体的な手順は別記事に。

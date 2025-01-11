@@ -224,4 +224,4 @@ WSLまわりのコマンド：
 > #残存リソースも削除
 > Remove-Item -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss" -Recurse
 ```
-さらに、`C:\Users\(ユーザ名)\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu_～～`を探してフォルダごと削除。これで完全に消える(はず)
+さらに、`C:\Users\(ユーザ名)\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu_～～`を探してフォルダごと削除。これでウンインスコ完了(のはず)
