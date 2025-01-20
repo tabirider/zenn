@@ -54,6 +54,10 @@ Gitのインストール前に入れておくのがおすすめ。[公式](https
 
 `Use external OpenSSH`を選択。Windows10からは`OpenSSH`が標準でバンドルされてるので、今回はそっちを利用。Gitとの連携手順は後ろの方を参照。他はそのまま`Next`で大丈夫。
 > SSHはGitHubとの暗号通信に必須。ここではRSAの公開鍵方式を使います。
+> Gitに同梱されてるSSHを使わないのは、[Windows界のSSHがカオス](https://qiita.com/slotport/items/e1d5a5dbd3aa7c6a2a24)だから。
+> ![](https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F107657%2Ff08d2c60-6f59-8a0b-5b04-fe97af33fe1a.png?ixlib=rb-4.0.0&auto=format&gif-q=60&q=75&w=1400&fit=max&s=f73cd0938e1cabbda9de947f6ee15982)
+> すごく分かりやすい・・です・・
+> なるべくWin謹製に寄せておくのが得策な気がする。
 
 Gitへのパスが通ってるか確認
 PowerShellから
@@ -209,7 +213,7 @@ WindowsのOpenSSHサービスは通常停止しているので、それを有効
 # ちなみにmkdirはPowerShellのコマンドレットNew-Itemのエイリアス。
 # PowerShell的に書くと
 > New-Item -Path "D:\Zenn" -ItemType Directory
-# になるらしい。無理やり古のDOS窓に似た動きにしてくれてるだけ。
+# になるらしい。無理やり古のDOS窓、†cmd.exe†に似た動きにしてくれてるだけ。
 # インターネッツ老人会のオッサンは非常に混乱する。
 ```
 ![](/images/setup-zenn-github/setting-win-path-07.png)

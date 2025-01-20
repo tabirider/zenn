@@ -1,12 +1,12 @@
 ---
-title: "WindowsでのWSL設定・Ubuntu導入(自分用メモ)"
+title: "Win→WSL2→Ubuntu→Docker→Python→Numba→CUDA→GPU+VSCode+Git環境構築②"
 emoji: "✍️"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["windows","wsl2","ubuntu","環境構築"]
-published: true
+published: false
 ---
 
-WSLの設定・Ubuntu導入までの手順メモ。
+WinでDockerでGPU使うPythonコード書くよその②WSL+Ubuntu編。概要は[前回](https://zenn.dev/tabirider/articles/tr-windows-ve-1)。
 
 ## WSLの導入
 
@@ -22,7 +22,7 @@ WSLの挙動を定義するconfファイル。2種類ある。詳細は[MSサイ
 
 ## .wslconfig
 **WSL全体に影響するパラメータ**。
-配置場所はWindowsの`C:\Users\(ユーザ名)\.wslconfig`。このファイルはデフォルトで存在しないので、必要なら手作業で作成。**記述にエラーがあると無視してデフォルト値でWSLが起動する**。Windowsかよ。
+配置場所はWindowsの`C:\Users\(ユーザ名)\.wslconfig`。このファイルはデフォルトで存在しないので、必要なら手作業で作成。**記述ミスは無視してデフォルト値でWSLが起動する**。Windowsかよ。
 
 ```:.wslconfig
 [wsl2]
@@ -46,7 +46,7 @@ processors=2
 |swapFile|path|%USERPROFILE%\ <br>AppData\Local\ <br>Temp\swap.vhdx|スワップ仮想diskへのパス<br>デフォはMSサイトの説明では←だが実際には`C:\Users\takak\AppData\Local\Temp\なんかごちゃごちゃしたところ\swap.vhdx`<br>通常は`wsl --shutdown`で削除されるが時々ゴミが残る。場所は`Temp`内を`swap.vhdx`で検索するのが早い|
 |pageReporting|boolean|true|WindowsにWSL未使用メモリの再利用を許可|
 |guiApplications|boolean|true|WSLでのGUI(WSLg)サポート|
-|debugConsole|boolean|false|distro開始時dmesgのコンソール出す(win11)|
+|debugConsole|boolean|false|distro開始時dmesgのコンソール出す(win11)。<br>****VSCodeをWSLに接続した状態で`wsl --shutdown`するとVSCodeが勝手にWSLを再起動し、その際`~/.bashrc`が走らず想定外の挙動になったりする**。trueにしておくとコンソールが出てWSL起動が見えるので、**true設定がおすすめ**。|
 |nestedVirtualization|boolean|true|WSLで入れ子VMを許可(win11)|
 |vmIdleTimeout|数値|60000|VMがアイドル状態になってからシャットダウンされるまでのミリ秒(win11)<br>[WSLではsystemdがインスタンスを維持しない](https://learn.microsoft.com/ja-jp/windows/wsl/systemd#how-does-enabling-systemd-affect-wsl-architecture)ので**シェルから抜けたら1分後にdistro自体が落ちる**、Windowsみ深い。0にしたら落ちなくなるかと思ったら10秒くらいで落ちる、無制限の設定はできないっぽい？|
 |dnsProxy|boolean|true|`networkingMode=NAT`時ホストのNATに対してLinuxのDNSサーバーを構成。false時はWindowsからLinuxにDNSサーバミラーリング|
@@ -80,7 +80,7 @@ key = value
 
 |key|value|default|内容|
 |--|--|--|--|
-|systemd|boolean|**なし**|trueで[systemdを起動](https://learn.microsoft.com/ja-jp/windows/wsl/wsl-config#systemd-support)。これを設定しないとsystemdは有効にならない|
+|systemd|boolean|distroによる|trueで[systemdを起動](https://learn.microsoft.com/ja-jp/windows/wsl/wsl-config#systemd-support)。これを設定しないとsystemdは有効にならない。[Ubuntuではsystemdの起動がデフォルトになった](https://learn.microsoft.com/ja-jp/windows/wsl/systemd#how-to-enable-systemd)らしい|
 |command|string|""|WSLインスタンス開始時の実行コマンド(rootで実行される。複数指定不可、その場合はシェルスクリプトを指定。win11)<br>command = /path/to/script.sh|
 
 
@@ -107,7 +107,7 @@ optionsの詳細
 |fmask|全ファイルに除外するアクセス許可のマスク|000|
 |dmask|全ディレクトリに除外するアクセス許可のマスク|000|
 |metadata|Windowsファイルシステムへのメタデータの追加|disabled|
-|case|[ディレクトリの大文字小文字の許可関係](https://learn.microsoft.com/ja-jp/windows/wsl/case-sensitivity)|off|
+|case|[ディレクトリの大文字小文字の許可関係](https://learn.microsoft.com/ja-jp/windows/wsl/case-sensitivity)。これもwinとlinuxで扱い違うからWSLでwinファイルは扱いたくない。[フォルダ毎にケースセンシティブ設定](https://learn.microsoft.com/ja-jp/windows/wsl/case-sensitivity#change-the-case-sensitivity-of-files-and-directories)までできるもよう|off|
 
 ### ネットワーク設定
 
@@ -141,7 +141,7 @@ optionsの詳細
 
 Powershellから
 
-```powershell
+```powershell:PowerShell
 > wsl --update      #WSL2に更新
 > wsl -l --online   #導入できるdistro確認
 ～～
@@ -159,7 +159,10 @@ Retype new password:        #pw
 ～
 # Ubuntuが起動
 ```
-```shell-session
+
+ログインしたら、カレントディレクトリがWindowsドキュメントフォルダになってる。気持ち悪いけどこの挙動を変える方法は見当たらない。とりあえずホームに逃げる。
+```shell-session:WSL
+name@machine:/mnt/c/Users/私の 名前$ cd ~
 $ cat /etc/os-release #OS確認
 PRETTY_NAME="Ubuntu 24.04.1 LTS"
 NAME="Ubuntu"
@@ -170,9 +173,13 @@ VERSION="24.04.1 LTS (Noble Numbat)"
 $ cat /proc/version #カーネル確認
 $ #WSL専用品のようです
 Linux version 5.15.167.4-microsoft-standard-WSL2 (root@f9c826d3017f) (gcc (GCC) 11.2.0, GNU ld (GNU Binutils) 2.37) #1 SMP Tue Nov 5 00:21:55 UTC 2024
+$ #パッケージ最新化
+$ sudo apt update
+$ sudo apt upgrade
+$ #終了
 $ exit
 ```
-```powershell
+```powershell:PowerShell
 > wsl -l --verbose #distro状態確認
   NAME      STATE           VERSION
 * Ubuntu    Stopped         2       #Ubuntuが入っているのを確認
@@ -181,28 +188,29 @@ $ exit
 これでUbuntuの導入完了。
 WSLまわりのコマンド：
 
-```powershell
+```powershell:PowerShell
 > wsl -l --online           #導入可能なdistroのリスト
 > wsl -l --verbose          #distroの実行状態を確認
-> wsl -u root -d Ubuntu     #rootでログイン
+> wsl                       #既定distroに既定ユーザで入る
+> wsl -d ubuntu             #Ubuntuに既定ユーザで入る
+> wsl -u root -d Ubuntu     #Ubuntuにrootで入る
 > wsl --terminate Ubuntu    #Ubuntuを終了
 > wsl --set-default Ubuntu  #既定distroをUbuntuに(複数distro導入してるとき)
-> wsl                       #既定distroに既定ユーザで入る
 > wsl --shutdown            #全distroを終了
 ```
 
-なお`wsl --shutdown`しても、例えばVisual Studio Code等からWSLにアタッチしていると**勝手にWSLが再起動**するもよう。味わい深い。
+なお`wsl --shutdown`しても、`Visual Studio Code`に`WSL`や`Dev Containers`拡張機能を入れてたりすると**勝手にWSLが再起動**する。`Dev Containers`に至っては拡張機能を有効にした瞬間にWSLを上げるようになってる。そういうの要らないんですけど。
 
 ちなみにWSL上のファイルはWindowsの
-![](/images/setup-wsl-ubuntu/wsl_vhdx_locate.png)
+![](/images/tr-windows-ve/wsl_vhdx_locate.png)
 
 `C:\Users\(ユーザ名)\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu_～～\LocalState\ext4.vhdx`
-またえらいところにいる。拡張子`.vhdx`はHyper-Vの仮想ストレージ。
+またえらいところにいる。CanonicalはUbuntuの開発元。拡張子`.vhdx`はHyper-Vの仮想ストレージ。
 試しにUbuntuを削除すると
 ```powershell
 > wsl --uninstall ubuntu
 ```
-![](/images/setup-wsl-ubuntu/wsl_vhdx_del_ubuntu.png)
+![](/images/tr-windows-ve/wsl_vhdx_del_ubuntu.png)
 **消えない。**
 もう一度Ubuntuを導入しようとしたら
 
@@ -224,4 +232,50 @@ WSLまわりのコマンド：
 > #残存リソースも削除
 > Remove-Item -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss" -Recurse
 ```
-さらに、`C:\Users\(ユーザ名)\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu_～～`を探してフォルダごと削除。これでウンインスコ完了(のはず)
+> さらに、`C:\Users\(ユーザ名)\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu_～～`を探してフォルダごと削除。これでウンインスコ完了(のはず)
+
+## WSLのsystemd有効化
+
+[公式](https://learn.microsoft.com/ja-jp/windows/wsl/systemd#how-to-enable-systemd)だと`Ubuntu`は`systemd`がデフォルトで有効になったらしい。念のため確認。
+`systemd`が動いてないと[systemctl](https://manpages.ubuntu.com/manpages/oracular/en/man1/systemctl.1.html)も[microk8s](https://microk8s.io/)も動かない。[systemdの詳細は公式](https://learn.microsoft.com/ja-jp/windows/wsl/systemd)。
+
+wsl.confの内容を確認。Ubuntu以外のdistroだとファイル自体がなかったりする。
+
+```shell-session:WSL
+$ #wsl.confが以下のように設定されていればOK
+$ cat /etc/wsl.conf
+[boot]
+systemd=true
+$ #systemdがPID 1で上がってることを確認
+$ ps -A | grep systemd
+      1 ?        00:00:01 systemd
+      2 ?        00:00:00 init-systemd(Ub
+～
+```
+
+systemdが上がっていなければ、wsl.confファイルを作成して上の内容を追記。
+
+```shell-session
+$ sudo nano /etc/wsl.conf
+```
+
+```
+[boot]
+systemd=true
+```
+
+`Ctrl`+`O` → `Enter` → `Ctrl` + `X`で保存して終了。いったんWSLを抜けて再起動する。
+
+```shell-session:WSL
+$ exit
+```
+
+```powershell:PowerShell
+> wsl --shutdown #WSLの全distroを停止
+> wsl -l --verbose #distroの稼動状態
+  NAME      STATE           VERSION
+* Ubuntu    Stopped         2　       #止まってる
+> wsl -d ubuntu #再起動
+```
+
+systemdの起動を確認して続き：[③VSCode+Docker編](https://zenn.dev/tabirider/articles/tr-windows-ve-3)

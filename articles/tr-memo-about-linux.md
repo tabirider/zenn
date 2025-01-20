@@ -1,8 +1,8 @@
 ---
-title: "WSL - Linux関係メモ"
+title: "WSL - Linuxリファレンス的な(自分用メモ)"
 emoji: "✍️"
-type: "idea" # tech: 技術記事 / idea: アイデア
-topics: ["bookmark"]
+type: "tech" # tech: 技術記事 / idea: アイデア
+topics: ["powershell","wsl"]
 published: false
 ---
 Linux関係、通常とWSL2-Ubuntuでの動作の違いも含めたメモ。
@@ -273,7 +273,7 @@ $ watch -n3 'ps -A u --sort -pmem'
 ```
 ### ユニットファイルのタイプ
 
-`/lib/systemd/system`を覗けばふいんきはわかる
+`/lib/systemd/system`を覗けばなんとなくわかる
 
 |拡張子|内容|
 |--|--|
@@ -348,7 +348,7 @@ lrwxrwxrwx 1 root root        27 Apr  9  2024 arptables -> /etc/alternatives/arp
 |-w-|2|更新|
 |r--|4|読込|
 
-### シンボリックリンクとハードリング
+### ハードリンクとシンボリックリンク
 
 |特徴|ハードリンク|シンボリックリンク|
 |--|--|--|
@@ -387,4 +387,17 @@ $ #ブロックサイズの確認
 $ stat --printf="%s bytes per block\n" .
 4096 bytes per block
 $ #↑WSLではブロックサイズがけっこう大きいもよう
+```
+
+
+## apt
+
+### apt install
+
+`-y`オプションで、インストール中に聞かれる`(Y/N)`は勝手に`Y`してくれる。このとき、タイムゾーンの選択が求められる場合はシステムの既存設定を適用してくれる。
+```shell-session
+$ #yオプションで自動インストール
+$ sudo apt install -y git
+$ #現在のタイムゾーン設定確認
+$ timedatectl
 ```

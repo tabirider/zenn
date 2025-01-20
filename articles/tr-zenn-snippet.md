@@ -2,7 +2,7 @@
 title: "Zenn-snippet"
 emoji: "✍️"
 type: "idea" # tech: 技術記事 / idea: アイデア
-topics: ["zenn"]
+topics: ["zenn","md"]
 published: false
 ---
 
@@ -178,13 +178,73 @@ https://github.com/tabirider/zenn/blob/d45918a9ab42869fee0da3f2ca283e952e93dafc/
 # mermaid
 <https://mermaid.js.org/ecosystem/tutorials.html>
 ```mermaid
-graph TB
-    A[Hard edge] -->|Link text| B(Round edge)
-    B --> C{Decision}
-    C -->|One| D[Result one]
-    C -->|Two| E[Result two]
+---
+title: ■タイトル■
+---
+flowchart TB
+subgraph WSL[ローカル環境 - WSL]
+  direction LR
+  subgraph DOCKER_VOLUME[docker volume]
+    LOCAL_REPO[(リポジトリ<br>#040;ローカル#041;)]
+  end
+  subgraph DOCKER[Docker]
+    subgraph CONTAINER[コンテナ]
+      GIT[Git]
+      SSH[SSH]
+    end
+  end
+  SSH_AGENT[SSHエージェント]
+  DISABLED_OBJ[無効オブジェ]
+end
+LOCAL_REPO <-- connect --> GIT
+SSH <--> SSH_AGENT
+class WSL cNode
+class DOCKER,DOCKER_VOLUME cCls1
+class CONTAINER,LOCAL_REPO,SSH_AGENT cCls2
+class SSH,GIT cCls3
+class DISABLED_OBJ cDisabled
+classDef cNode fill:#cff,stroke:#3ff
+classDef cCls1 fill:#69f,stroke:#36d,color:#fff
+classDef cCls2 fill:#9cf,stroke:#36d
+classDef cCls3 fill:#cef,stroke:#36d
+classDef cCls3Ref fill:#cef,stroke:#36d,stroke-dasharray:5 5
+classDef cDisabled fill:#ccc,stroke:#666
 ```
 クリックイベント無効、ブロックあたり2000文字、ブロックあたりのChain数10以下
 
 
 ````
+
+```mermaid
+---
+title: ■タイトル■
+---
+flowchart TB
+subgraph WSL[ローカル環境 - WSL]
+  direction LR
+  subgraph DOCKER_VOLUME[docker volume]
+    LOCAL_REPO[(リポジトリ<br>#040;ローカル#041;)]
+  end
+  subgraph DOCKER[Docker]
+    subgraph CONTAINER[コンテナ]
+      GIT[Git]
+      SSH[SSH]
+    end
+  end
+  SSH_AGENT[SSHエージェント]
+  DISABLED_OBJ[無効オブジェ]
+end
+LOCAL_REPO <-- connect --> GIT
+SSH <--> SSH_AGENT
+class WSL cNode
+class DOCKER,DOCKER_VOLUME cCls1
+class CONTAINER,LOCAL_REPO,SSH_AGENT cCls2
+class SSH,GIT cCls3
+class DISABLED_OBJ cDisabled
+classDef cNode fill:#cff,stroke:#3ff
+classDef cCls1 fill:#69f,stroke:#36d,color:#fff
+classDef cCls2 fill:#9cf,stroke:#36d
+classDef cCls3 fill:#cef,stroke:#36d
+classDef cCls3Ref fill:#cef,stroke:#36d,stroke-dasharray:5 5
+classDef cDisabled fill:#ccc,stroke:#666
+```
