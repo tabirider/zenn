@@ -87,13 +87,13 @@ CUDA --> DRIVER
 DRIVER --> GPU
 ```
 
-### 条件
+＜条件＞
 
 - `Win10 21H2`, `Win11`で`WSL2`を利用
 - NVIDIA製GPUのみ
 - NVIDIAドライバ510以降が必要
 
-### NVIDIAドライバインストール
+## NVIDIAドライバインストール
 
 念のため[NVIDIAのサイト](https://www.nvidia.com/en-us/drivers/)から最新ドライバを導入。
 ドライバのバージョンはPowerShellから確認できる。
@@ -122,7 +122,7 @@ DRIVER --> GPU
 ```
 
 
-### NVIDIA Container Toolkitのインストール
+## NVIDIA Container Toolkitのインストール
 
 [NVIDIAのサイト](https://docs.nvidia.com/datacenter/cloud-native/)参照。NVIDIA Container ToolkitのインストールでNVIDIA Container Runtimeが導入され、コンテナ上でGPUが使えるようになる。(Kubernetesの場合はNVIDIA Device Pluginの導入が必要。手順が異なるので注意)
 ![](/images/tr-windows-ve/nvidia-container-toolkit-overview.png)
@@ -141,7 +141,7 @@ DockerがNVIDIA Container Runtimeを使うように設定。
 ```shell-session:WSL
 $ sudo nvidia-ctk runtime configure --runtime=docker
 ```
-これで`/cat/docker/daemon.json`のruntimeが更新される。
+これで`/cat/docker/daemon.json`の`runtime`が更新される。
 ```shell-session:WSL
 $ cat /etc/docker/daemon.json
 {
@@ -154,7 +154,7 @@ $ cat /etc/docker/daemon.json
 }
 ```
 
-### Python/NumPy/Numba/CUDA入りコンテナ作成
+## Python/NumPy/Numba/CUDA入りコンテナ作成
 
 [NVIDIAのCUDA on WSLページ](https://docs.nvidia.com/cuda/wsl-user-guide/index.html#cuda-support-for-wsl-2)ではLinux用のCUDA入れると**ドライバが上書きされちゃうからダメ**と強く警告されてるが、
 
@@ -165,18 +165,40 @@ $ cat /etc/docker/daemon.json
 
 ![](/images/tr-windows-ve/nvidia-cuda-selection.png)
 
-サイトの手順通り導入
+### Dockerfile準備
 
-```shell-session:WSL
-$ wget https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-wsl-ubuntu.pin
-$ wget https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-wsl-ubuntu.pin
-$ sudo mv cuda-wsl-ubuntu.pin /etc/apt/preferences.d/cuda-repository-pin-600
-$ wget https://developer.download.nvidia.com/compute/cuda/12.6.3/local_installers/cuda-repo-wsl-ubuntu-12-6-local_12.6.3-1_amd64.deb
-$ sudo dpkg -i cuda-repo-wsl-ubuntu-12-6-local_12.6.3-1_amd64.deb
-$ sudo cp /var/cuda-repo-wsl-ubuntu-12-6-local/cuda-*-keyring.gpg /usr/share/keyrings/
-$ sudo apt-get update
-$ sudo apt-get -y install cuda-toolkit-12-6
-```
+サイトの手順をDockerfileに追加する。前回の最終版に足しましょう。
+
+```dockerfile:Dockerfile
+# ベースイメージにUbuntuを指定
+FROM ubuntu:latest
+
+# アップデート
+RUN apt update && apt upgrade -y
+
+# マニュアル関係・unminimize(通常版Ubuntuに近い構成にする)
+RUN apt install -y unminimize man-db manpages manpages-posix manpages-posix-dev \
+    && yes | unminimize
+
+# CUDA関連インストール
+RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb \
+    &&  dpkg -i cuda-keyring_1.1-1_all.deb
+    &&  apt update
+    &&  apt -y install cuda-toolkit-12-6
+
+# その他パッケージインストール
+RUN apt install -y \
+        git \
+        python3 \
+        ssh \
+        vim \
+    && apt clean && rm -rf /var/lib/apt/lists/*
+
+# 作業ディレクトリの設定
+WORKDIR /app
+
+# デフォルトの実行コマンド
+CMD ["bash"]```
 
 
 
