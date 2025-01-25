@@ -11,12 +11,14 @@ published: true
 ## エクスプローラを何とかしたい
 
 たかがファイラが何でこんな重くて使いにくいんだよ。
-フォルダツリーの階層を示す点線が出なくなったから、複雑なフォルダ構造になるとどれとどれが同じ階層なのか、画面に定規あてないと分からないレベル。ついでに大量の画像ファイルを扱おうとすると勝手に画像プレビューしようとするから、あり得ないくらい重くなる。
+フォルダツリーの階層を示す点線が出なくなったから、複雑なフォルダ構造になるとどれとどれが同じ階層なのか、画面に定規あてないと分からないレベル。
+![hoge](/images/tr-windows-tips/explorer.png)
+ついでに大量の画像ファイルを扱おうとすると勝手に画像プレビューしようとするから、あり得ないくらい重くなる。
 [秀丸ファイラーClassic](https://hide.maruo.co.jp/software/hmfilerclassic.html)が古のスタイルを呼び戻してくれる。昭和生まれのオッサン必需品、お金を払う価値がある。
-![](/images/tr-windows-tips/hidemaru-filer.png)
 実家のような安心感。
-![](/images/tr-windows-tips/explorer-vs-hidemaru-filer.png)
+![](/images/tr-windows-tips/hidemaru-filer.png)
 これだけ違う。
+![](/images/tr-windows-tips/explorer-vs-hidemaru-filer.png)
 
 ## 画像関連
 
