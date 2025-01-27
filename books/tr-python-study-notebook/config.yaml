@@ -1,0 +1,16 @@
+title: "Python学習帳"
+summary: "Python勉強したことメモ、随時更新"
+topics: ["python"] # トピック（5つまで）
+published: false # falseだと下書き
+price: 0 # 有料の場合200〜5000
+toc_depth: 2
+chapters:
+  - tr-notes-on-python-02-pep0008-style-guide
+#  - tr-notes-on-python-02-pep0257-docstring
+  - tr-notes-on-python-03-001-zen-of-python
+  - tr-notes-on-python-03-002-underscore
+#  - tr-notes-on-python-03-999-full-grammar
+#  - tr-notes-on-python-03-011-docstring
+#  - tr-notes-on-python-03-501-import
+#  - tr-notes-on-python-04-101-mypy
+#  - tr-notes-on-python-04-201-numpy
