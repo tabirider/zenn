@@ -1,19 +1,29 @@
 ---
-title: "Win→WSL2→Ubuntu→Docker→Python→Numba→CUDA→GPU+VSCode+Git環境構築②"
-emoji: "✍️"
-type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["windows","wsl2","ubuntu","環境構築"]
-published: false
+title: "WSL2・Ubuntu"
 ---
 
-WinでDockerでGPU使うPythonコード書くよその②WSL+Ubuntu編。概要は[前回](https://zenn.dev/tabirider/articles/tr-windows-ve-1)。
+:::message
+`PowerShell`と`WSL-Ubuntu`が混じるので、
+
+```powershell:PowerShell
+> #これはPowerShell
+```
+
+```shell-session:WSL
+$ #これはWSL(Ubuntu)
+```
+
+```dockerfile:wsl.conf
+# ↑ファイルの内容はファイル名
+```
+:::
 
 ## WSLの導入
 
 WSLはWindowsに同梱されてるが、もし壊れても[GitHub](https://github.com/microsoft/WSL/releases)から落とせる。
 
 ## .wslconfigとwsl.conf
-WSLの挙動を定義するconfファイル。2種類ある。詳細は[MSサイト](https://learn.microsoft.com/ja-jp/windows/wsl/wsl-config#wslconfig)。
+WSLの挙動を定義するconfファイル。2種類ある。詳細は[MSサイト](https://learn.microsoft.com/ja-jp/windows/wsl/wsl-config)。
 
 |ファイル|場所|意味|
 |--|--|--|
@@ -46,9 +56,9 @@ processors=2
 |swapFile|path|%USERPROFILE%\ <br>AppData\Local\ <br>Temp\swap.vhdx|スワップ仮想diskへのパス<br>デフォはMSサイトの説明では←だが実際には`C:\Users\takak\AppData\Local\Temp\なんかごちゃごちゃしたところ\swap.vhdx`<br>通常は`wsl --shutdown`で削除されるが時々ゴミが残る。場所は`Temp`内を`swap.vhdx`で検索するのが早い|
 |pageReporting|boolean|true|WindowsにWSL未使用メモリの再利用を許可|
 |guiApplications|boolean|true|WSLでのGUI(WSLg)サポート|
-|debugConsole|boolean|false|distro開始時dmesgのコンソール出す(win11)。<br>****VSCodeをWSLに接続した状態で`wsl --shutdown`するとVSCodeが勝手にWSLを再起動し、その際`~/.bashrc`が走らず想定外の挙動になったりする**。trueにしておくとコンソールが出てWSL起動が見えるので、**true設定がおすすめ**。|
+|debugConsole|boolean|false|distro開始時dmesgのコンソール出す(win11)。<br>**VSCodeをWSLに接続した状態で`wsl --shutdown`するとVSCodeが勝手にWSLを再起動し、その際`~/.bashrc`が走らず想定外の挙動になったりする**。trueにしておくとコンソールが出てWSL起動が見えるので、**true設定がおすすめ**。|
 |nestedVirtualization|boolean|true|WSLで入れ子VMを許可(win11)|
-|vmIdleTimeout|数値|60000|VMがアイドル状態になってからシャットダウンされるまでのミリ秒(win11)<br>[WSLではsystemdがインスタンスを維持しない](https://learn.microsoft.com/ja-jp/windows/wsl/systemd#how-does-enabling-systemd-affect-wsl-architecture)ので**シェルから抜けたら1分後にdistro自体が落ちる**、Windowsみ深い。0にしたら落ちなくなるかと思ったら10秒くらいで落ちる、無制限の設定はできないっぽい？|
+|vmIdleTimeout|数値|60000|VMがアイドル状態になってからシャットダウンされるまでのミリ秒(win11)<br>**[WSLではsystemdがインスタンスを維持しない](https://learn.microsoft.com/ja-jp/windows/wsl/systemd#how-does-enabling-systemd-affect-wsl-architecture)から、シェルから抜けたら1分後にdistro自体が落ちる**。0にしたら10秒くらいで落ちる、無制限の設定はできないっぽい。<br>WSLを上げたPoserShellのウィンドウを閉じなければ落ちないので、特に変更する必要はなさそう。|
 |dnsProxy|boolean|true|`networkingMode=NAT`時ホストのNATに対してLinuxのDNSサーバーを構成。false時はWindowsからLinuxにDNSサーバミラーリング|
 |networkingMode|string|NAT|`mirrored`でネットワークモードミラー化(win11/22H2～)|
 |firewall|boolean|true|true時Winファイアウォール＋Hyper-V固有規則でフィルタ(win11/22H2～)|
@@ -81,7 +91,7 @@ key = value
 |key|value|default|内容|
 |--|--|--|--|
 |systemd|boolean|distroによる|trueで[systemdを起動](https://learn.microsoft.com/ja-jp/windows/wsl/wsl-config#systemd-support)。これを設定しないとsystemdは有効にならない。[Ubuntuではsystemdの起動がデフォルトになった](https://learn.microsoft.com/ja-jp/windows/wsl/systemd#how-to-enable-systemd)らしい|
-|command|string|""|WSLインスタンス開始時の実行コマンド(rootで実行される。複数指定不可、その場合はシェルスクリプトを指定。win11)<br>command = /path/to/script.sh|
+|command|string|""|WSLインスタンス開始時の実行コマンド(rootで実行される。複数指定不可、その場合はシェルスクリプトを指定。win11)<br>`command = /path/to/script.sh`|
 
 
 ### 自動マウントの設定
@@ -107,7 +117,7 @@ optionsの詳細
 |fmask|全ファイルに除外するアクセス許可のマスク|000|
 |dmask|全ディレクトリに除外するアクセス許可のマスク|000|
 |metadata|Windowsファイルシステムへのメタデータの追加|disabled|
-|case|[ディレクトリの大文字小文字の許可関係](https://learn.microsoft.com/ja-jp/windows/wsl/case-sensitivity)。これもwinとlinuxで扱い違うからWSLでwinファイルは扱いたくない。[フォルダ毎にケースセンシティブ設定](https://learn.microsoft.com/ja-jp/windows/wsl/case-sensitivity#change-the-case-sensitivity-of-files-and-directories)までできるもよう|off|
+|case|[ディレクトリの大文字小文字の許可関係](https://learn.microsoft.com/ja-jp/windows/wsl/case-sensitivity)。これもwinとlinuxで扱い違うからWSLでwinファイルは扱いたくない。[フォルダ毎にケースセンシティブ設定](https://learn.microsoft.com/ja-jp/windows/wsl/case-sensitivity#modify-case-sensitivity)までできるもよう|off|
 
 ### ネットワーク設定
 
@@ -232,7 +242,7 @@ WSLまわりのコマンド：
 > #残存リソースも削除
 > Remove-Item -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss" -Recurse
 ```
-> さらに、`C:\Users\(ユーザ名)\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu_～～`を探してフォルダごと削除。これでウンインスコ完了(のはず)
+> さらに、`C:\Users\(ユーザ名)\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu_～～`を探してフォルダごと削除。これでアンインストール完了(のはず)
 
 ## WSLのsystemd有効化
 
@@ -253,7 +263,7 @@ $ ps -A | grep systemd
 ～
 ```
 
-systemdが上がっていなければ、wsl.confファイルを作成して上の内容を追記。
+systemdが上がっていなければ、wsl.confファイルを作成して`systemd=true`追記。
 
 ```shell-session
 $ sudo nano /etc/wsl.conf
@@ -278,4 +288,4 @@ $ exit
 > wsl -d ubuntu #再起動
 ```
 
-systemdの起動を確認して続き：[③VSCode+Docker編](https://zenn.dev/tabirider/articles/tr-windows-ve-3)
+systemdの起動を確認できればOK。

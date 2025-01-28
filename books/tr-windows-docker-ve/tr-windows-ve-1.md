@@ -1,13 +1,13 @@
 ---
-title: "Win→WSL2→Ubuntu→Docker→Python→Numba→CUDA→GPU+VSCode+Git環境構築①"
-emoji: "✍️"
-type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["wsl2","docker","kubernetes","containerd"]
-published: false
+title: "概要"
 ---
 おじさんパイソン勉強しちゃうぞーと思ったら`C:\Users\私の 名前\AppData\Roaming\Python\Python313\Scripts`みたいになって草。~~だからWinは~~
 やっぱリナックスよと思ってWSLからDocker上げたらKubernetesがサポートしてない？Dockerオワタて書いた人が燃えてたり何があったんや(15年くらい技術から離れてた人)
-何やかんやでWindowsでDockerコンテナ上げてGPU利用するPythonコード書くとこまで進めたよその①概要メモ。
+何やかんやでWindowsでDockerコンテナ上げてGPU利用するPythonコード書くとこまで進めてみたのでメモ。
+
+:::message
+各公式ドキュメントが正義です。ここは勉強したことのチラ裏なので理解が間違ってるところもあると思います。
+:::
 
 ##  WSL
 
@@ -24,8 +24,11 @@ WSL自体はLinuxじゃなくてプラットフォーム。ディストリビュ
 ### WindowsファイルシステムとWSL2
 
 WSL2はファイルシステム自体もWindowsから完全に隔離している(実際にはWindows内の`.vhdx`形式ファイルをストレージとして利用)。
-しかし、なんとWSL2は標準で**Windowsの全ドライブを`/mnt/`下にマウント**しており、そこを経由してWSLからWindows上の全てのファイルを参照・更新できる(この仕様は[`wsl.conf`で変更できる](https://zenn.dev/tabirider/articles/tr-windows-ve-2)が、VisualStudioCode拡張機能にはこれを利用するのもあるので、気軽にOFFできない)。
-当然、Linux/Winファイルシステムの仕様差異が問題になる。MSはこれを解決するために[涙ぐましい努力](https://learn.microsoft.com/ja-jp/windows/wsl/case-sensitivity)を続けているが、せっかくLinux使えるんだからWSLからWindowsファイルの積極利用は避けたほうが無難(だと思う)。
+しかし、なんとWSL2は標準で**Windowsの全ドライブを`/mnt/`下にマウント**しており、そこを経由してWSLからWindows上の全てのファイルを参照・更新できる(この仕様は`wsl.conf`で変更できるが、VisualStudioCode拡張機能にはこれを利用するのもあるので、気軽にOFFできない)。
+
+> 当然、Linux/Winファイルシステムの仕様差異が問題になる。MSはこれを解決するために[涙ぐましい努力](https://learn.microsoft.com/ja-jp/windows/wsl/case-sensitivity)をしてるみたい。
+
+まあ、せっかくLinux使えるんだからWSLからWindowsファイルの積極利用は避けたほうが無難(だと思う)。
 
 ## コンテナ仮想化技術
 
@@ -49,7 +52,7 @@ Dockerはイメージ構築・コンテナ起動／管理を行うパッケー�
 - ホストOSのファイルシステムをコンテナにマウントすることで、コンテナ破棄してもデータは消えない(永続化)。Dockerは専用のボリューム管理機能も持っているので、そっちを使ってもいい
 - 必要に応じてコンテナの状態をイメージとして保存(イメージはコンテナのスナップショット)
 - 複数のコンテナを同時に制御できる(Docker compose)。DB・Webサーバ等を立ち上げ、コンテナ間通信も容易。
-- 作ったコンテナは他のメンバーと共有、そのままクラウドサービスにデプロイできる。
+- 作ったコンテナはDockerHubやGitHub Packagesとかで他のメンバーと共有、そのままクラウドサービスにデプロイできる。
 
 ```mermaid
 ---
@@ -225,7 +228,7 @@ runc --> container
 ここまで理解してDocker入門関係の情報を漁ると、たいがいWindowsにDocker Desktopをインスコしようねってなってる。けど色々試して、これは使わないことにした。
 Docker DesktopはGUIでイメージ構築、コンテナ実行までできる。ただ、これをインストールしてみるとWSL上に謎のディストリビューション「docker-desktop」が現れる。
 
-```powershell
+```powershell:PowerShell
 PS C:\Users\takak> wsl -l --verbose          #導入されているdistro一覧
   NAME              STATE           VERSION
 * Ubuntu            Running         2        #自分で導入したもの
@@ -238,7 +241,7 @@ $ sudo --help
 ```
 
 調べたら、Docker Desktopはこのディストリビューション上でコンテナを実行してるみたい。どうせ開発作業はコンテナ上で完結するから必要最小限の構成で、なんならログインも非推奨のもよう。
-[Dockerのドキュメント](https://docs.docker.jp/desktop/windows/wsl.html)では
+[Dockerのドキュメント](https://docs.docker.jp/desktop/windows/wsl.html#wsl-2-docker)では
 > Docker Desktop では何らかの Linux ディストリビューションをインストールする必要はありません。 docker CLI と UI は追加の Linux ディストリビューションがなくても動作します。しかしながら、**最高の開発体験を得るためには、少なくとも１つのディストリビューションを追加**し、次のようにして Docker サポートを有効化するのを推奨します。
 
 ？結局、何かのdistro入れろってなってる。確かにDocker Desktopでも、
@@ -246,8 +249,9 @@ $ sudo --help
 どのdistro使うか選択できるみたい。
 ？？そんならdocker-desktopって要らなくね？？
 
-WSLで書いたみたいに、WSL(2)からWindowsのファイルシステム使うとオーバーヘッドが大きいから、ファイル管理はWSLで完結させたい。コンテナは環境変えるたびにどんどん使い捨てていくので、SSHキーや書いたソースコードをコンテナ上に放置すると消えてしまう。なので、コンテナからWSLファイルシステムをマウントするのが最適解になるけど、そのWSL上の謎のdistroにログインもしないでってのは勝手が悪い。
-コンテナ裏側の動作が秘匿されるのも構造理解の障壁になる。結局WSLにUbuntu入れて、その上にLinux版Dockerを導入してコンテナを立ち上げるのがシンプルで早い(しDockerDesktopでマウス使う必要もない)という結論になった。
+WSLで書いたみたいに、WSL(2)からWindowsのファイルシステム使うとオーバーヘッドが大きいから、ファイル管理はWSLで完結させたい。コンテナは環境変えるたびにどんどん使い捨てていくので、SSHキーや書いたソースコードをコンテナ上に放置すると消えてしまう。なので、コンテナからWSLファイルシステムをマウントすることになるけど、そのWSL上の謎のdistroにログインもしないでってのは勝手が悪い。
+コンテナ裏側の動作が秘匿されるのも、親切設計なのは分かってるけどDocker勉強という意味ではマイナスな気もする。あと昭和生まれのおじさんはマウスが苦手なのです。
+結局WSLにUbuntu入れて、その上にLinux版Dockerを導入してコンテナを立ち上げることにした。
 
 ## 最終的に作った環境
 
@@ -295,5 +299,3 @@ classDef disabled fill:#ccc,stroke-dasharray:5 5, stroke:#666
 
 VisualStudio CodeからWSL拡張機能でWSL上のファイルシステムにアクセスできるし、Dev Containers拡張機能でコンテナ内に直接アタッチできるし、Docker拡張機能でDocker Desktopに近いことできるし、Python拡張機能でデバッグもできる(Dockerを使わずcontainerdだけだと、コンテナ内にSSH立てて経由する必要がある。このあたりDockerの方がやっぱり便利)。GitのローカルリポジトリはホストOSになるUbuntu上に作って、コンテナ側からマウントすることでコンテナを乗り換えても維持される。
 WindowsにVcXsrvを入れれば、X Window SystemからDISPLAYポート経由でLinuxデスクトップを使えることも確認した(けど必要性はないので満足して終わった)。
-
-続き：[②WSL+Ubuntu設定編](https://zenn.dev/tabirider/articles/tr-windows-ve-2)

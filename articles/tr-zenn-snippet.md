@@ -6,7 +6,16 @@ topics: ["zenn","md"]
 published: false
 ---
 
-````markdown
+````
+
+---
+title: "タイトル"
+emoji: "✍️"
+type: "tech" # tech: 技術記事 / idea: アイデア
+topics: ["topic1","topic2"]
+published: false
+---
+
 <!-- コメント(1行のみ) -->
 
 ## 見出し

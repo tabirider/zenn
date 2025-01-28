@@ -1,0 +1,13 @@
+title: "Win→WSL2→Ubuntu→Docker→Python→Numba→CUDA→GPU+VSCode+Git環境構築"
+summary: "長年技術から離れてたオッサンがWin11のWSL2にUbuntu入れてPythonコードをNumbaでJITしてCUDA経由でNVIDIA GPUを使えるDockerコンテナを上げるとこまでの手順メモ。"
+topics: ["wsl2","docker","python","cuda","numba"] # トピック（5つまで）
+published: true # falseだと下書き
+price: 0 # 有料の場合200〜5000
+toc_depth: 2
+chapters:
+  - tr-windows-ve-1
+  - tr-windows-ve-2
+  - tr-windows-ve-3
+  - tr-windows-ve-4
+  - tr-windows-ve-5
+  - tr-windows-ve-6
