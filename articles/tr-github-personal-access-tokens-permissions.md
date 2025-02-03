@@ -11,7 +11,7 @@ GitHubのPAT設定が細かすぎて草。
 
 ## Personal Access Token
 
-GitHubでは[SSHよりHTTP接続を推奨](https://docs.github.com/ja/get-started/getting-started-with-git/set-up-git#connecting-over-https-recommended)しているが、`HTTPS`接続でのパスワード認証は廃止済。代わりに`Personal Access Token(PAT)`を使う。
+GitHubでは[SSHよりHTTPS接続を推奨](https://docs.github.com/ja/get-started/getting-started-with-git/set-up-git#connecting-over-https-recommended)しているが、`HTTPS`接続でのパスワード認証は廃止済。代わりに`Personal Access Token(PAT)`を使う。
 ..んだけど、特に`Fine-grained tokens`は権限設定が細かすぎて読んでるうちに日が暮れる。
 最後まで読んで、ひとまず`Contents`だけ設定すればOK、あとは使っているうちに必要なら追加していけばいい、と理解した。
 
